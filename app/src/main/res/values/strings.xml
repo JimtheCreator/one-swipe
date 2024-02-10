@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">One Swipe</string>
+    <string name="using_this_app_and_its_features_requires_access_to_your_installed_apps_inventory_which_is_collected_and_stored_locally_so_you_can_select_and_save_as_favourites">Using this app and its features requires access to your installed apps inventory which is collected and stored locally so you can select and save them as favourites.\n\nDon\'t worry we will never access any of your data usage.</string>
+</resources>

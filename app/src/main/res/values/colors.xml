@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="cool">#80FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="grey">#CBCBCB</color>
+    <color name="blue">#57A0D3</color>
+    <color name="offwhite">#F5F5F5</color>
+    <color name="thickwhite">#E5E5E5</color>
+    <color name="thickGrey">#808080</color>
+    <color name="red">#F0F40432</color>
+    <color name="boldred">#170808</color>
+    <color name="invincibleColor">#00000000</color>
+    <color name="thickerwhite">#E0E0E0</color>
+    <color name="lightBlack">#242526</color>
+    <color name="niceblue">#66CCFF</color>
+</resources>
