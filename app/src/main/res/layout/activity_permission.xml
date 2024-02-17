@@ -134,7 +134,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/sanfrans_bold"
-                    android:text="Shortcuts"
+                    android:text="One Swipe"
                     android:textColor="@color/lightBlack"
                     android:textSize="25sp" />
 
@@ -163,10 +163,9 @@
                             android:textColor="@color/black"
                             android:textSize="15sp" />
 
-
                         <ImageView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:src="@drawable/baseline_toggle_on_24" />

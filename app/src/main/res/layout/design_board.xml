@@ -6,15 +6,16 @@
     android:orientation="vertical">
 
 
+
     <LinearLayout
         android:id="@+id/themainthing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
 
         <LinearLayout
+            android:id="@+id/holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -79,7 +80,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="15dp"
+                        android:layout_marginStart="10dp"
                         android:fontFamily="@font/sanfrans_medium"
                         android:text="Settings"
                         android:textColor="@color/black"
@@ -215,6 +216,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/most"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"

@@ -1,7 +1,7 @@
 package mappedvision.shortcuts.net;
 
-import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -14,7 +14,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,7 +52,7 @@ public class PermissionActivity extends AppCompatActivity {
         ClickableSpan clickableSpan1 = new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
-                gotoURL("https://pages.flycricket.io/moreeo-1/terms.html");
+                gotoURL();
             }
 
             @Override
@@ -88,7 +87,13 @@ public class PermissionActivity extends AppCompatActivity {
 
     }
 
-    private void gotoURL(String url) {
+    private void gotoURL() {
+        try {
+            Uri uri = Uri.parse("https://sites.google.com/view/privacy-policy-oneswipe/home");
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        }catch (Exception e ){
+            e.printStackTrace();
+        }
     }
 
 
@@ -96,14 +101,6 @@ public class PermissionActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (UsageStatsHelper.isUsageAccessPermissionGranted(getApplicationContext())) {
-            // The permission is granted
-            Intent intent = new Intent(getApplicationContext(), ShortcutService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent);
-            } else {
-                startService(intent);
-            }
-
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         }

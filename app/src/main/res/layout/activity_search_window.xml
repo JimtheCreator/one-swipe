@@ -1,148 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:theme="@style/TransparentTheme"
     android:layout_height="match_parent"
-    tools:context=".SearchWindowActivity">
-
+    android:background="@color/offwhite"
+    android:id="@+id/rooot"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".SearchWindowActivity"
+    >
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="35dp"
+        android:layout_above="@id/sheet"
         android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:fontFamily="@font/light"
-            android:textSize="14sp"
-            android:text="One-Swipe Suggestions"/>
+            android:fontFamily="@font/sanfrans_medium"
+            android:text="Suggestions"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
 
 
         <RelativeLayout
-            android:background="@drawable/top_search"
-            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
-            android:layout_height="200dp">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:id="@+id/topsearch"
+            android:background="@drawable/top_search">
 
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/suggestions_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="never"/>
+                android:overScrollMode="never"
+                android:padding="5dp" />
 
 
             <androidx.recyclerview.widget.RecyclerView
-                android:visibility="gone"
                 android:id="@+id/search_apps_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="never"/>
+                android:overScrollMode="never"
+                android:padding="5dp"
+                android:visibility="gone" />
 
 
         </RelativeLayout>
+
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="5dp"
+
+    <RelativeLayout
+        android:id="@+id/sheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/dark_shape_translucent"
+        android:fitsSystemWindows="true"
+        android:padding="2dp">
 
-
-        <RelativeLayout
-            android:id="@+id/close_window"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/white_circle">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="15dp"
-                android:src="@drawable/baseline_close_24"
-                app:tint="@color/black" />
-
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:fitsSystemWindows="true"
-            android:id="@+id/see"
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_bar"
+            style="@style/CustomSearchViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/dark_shape_translucent">
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search" />
 
 
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/xbn"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content">-->
 
-            <LinearLayout
-                android:id="@+id/xbn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_toStartOf="@+id/drop_down">
+        <!--            <ImageView-->
+        <!--                android:layout_width="30dp"-->
+        <!--                android:layout_height="30dp"-->
+        <!--                android:layout_gravity="center_vertical"-->
+        <!--                android:src="@drawable/baseline_search_24" />-->
 
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/baseline_search_24" />
+        <!--            <EditText-->
+        <!--                android:id="@+id/EditText"-->
+        <!--                android:layout_width="0dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginStart="15dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:background="@color/invincibleColor"-->
+        <!--                android:hint="Search"-->
+        <!--                android:textColor="@color/white"-->
+        <!--                android:inputType="text"-->
+        <!--                android:layout_gravity="clip_vertical"-->
+        <!--                android:textColorHint="@color/offwhite" />-->
 
-                <EditText
-                    android:id="@+id/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="15dp"
-                    android:background="@color/invincibleColor"
-                    android:hint="Search"
-                    android:textColor="@color/white"
-                    android:textColorHint="@color/thickGrey" />
+        <!--        </LinearLayout>-->
 
-            </LinearLayout>
+        <!--        <RelativeLayout-->
+        <!--            android:id="@+id/drop_down"-->
+        <!--            android:layout_width="30dp"-->
+        <!--            android:layout_height="30dp"-->
+        <!--            android:layout_alignParentEnd="true"-->
+        <!--            android:layout_centerVertical="true"-->
+        <!--            android:layout_marginEnd="10dp"-->
+        <!--            android:background="@drawable/white_circle">-->
 
-            <RelativeLayout
-                android:id="@+id/drop_down"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/white_circle">
+        <!--            <ImageView-->
+        <!--                android:layout_width="25dp"-->
+        <!--                android:layout_height="25dp"-->
+        <!--                android:layout_centerInParent="true"-->
+        <!--                android:layout_gravity="center_vertical"-->
+        <!--                android:layout_marginStart="15dp"-->
+        <!--                android:src="@drawable/baseline_close_24" />-->
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="15dp"
-                    android:src="@drawable/baseline_arrow_downward_24" />
+        <!--        </RelativeLayout>-->
 
-            </RelativeLayout>
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </RelativeLayout>
+

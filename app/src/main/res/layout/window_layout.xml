@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,41 +32,40 @@
 
         </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/search_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/og_layout">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/search_bar"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_horizontal"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:layout_marginBottom="10dp"-->
+<!--            android:background="@drawable/og_layout">-->
 
 
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:src="@drawable/baseline_search_24" />
+<!--            <ImageView-->
+<!--                android:layout_width="15dp"-->
+<!--                android:layout_height="15dp"-->
+<!--                android:layout_gravity="center_vertical"-->
+<!--                android:layout_marginStart="10dp"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:layout_marginBottom="5dp"-->
+<!--                android:src="@drawable/baseline_search_24" />-->
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
-                android:fontFamily="@font/light"
-                android:text="Search"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center_vertical"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:layout_marginBottom="5dp"-->
+<!--                android:fontFamily="@font/light"-->
+<!--                android:text="Search"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="13sp" />-->
 
-
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
 
         <LinearLayout
@@ -95,7 +95,7 @@
                     android:text="Recent Apps"
                     android:textColor="@color/white"
                     android:textSize="15sp"
-                    />
+                    android:visibility="gone" />
 
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -105,22 +105,23 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="5dp"
-                    android:overScrollMode="never" />
+                    android:overScrollMode="never"
+                    android:visibility="gone" />
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="15dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:fontFamily="@font/sanfrans_bold"
                         android:text="Favourite Apps"
-                        android:layout_gravity="center_vertical"
                         android:textColor="@color/white"
                         android:textSize="15sp" />
 
@@ -129,9 +130,9 @@
                         android:id="@+id/instructions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="5dp"
                         android:fontFamily="@font/regular"
-                        android:layout_gravity="center_vertical"
                         android:textColor="@color/offwhite"
                         android:textSize="15sp" />
 
@@ -149,28 +150,53 @@
 
             </LinearLayout>
 
-            <RelativeLayout
-                android:id="@+id/close"
-                android:layout_width="120dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center_horizontal"
+            <LinearLayout
+                android:background="@drawable/og_layout"
                 android:layout_marginStart="25dp"
                 android:layout_marginEnd="25dp"
-                android:layout_marginBottom="25dp"
-                android:background="@drawable/buttonshaped">
+                android:layout_marginBottom="55dp"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content">
 
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:fontFamily="@font/sanfrans_bold"
-                    android:text="Close"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
+                <RelativeLayout
+                    android:id="@+id/close"
+                    android:layout_width="135dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/thicker_blue">
 
 
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/sanfrans_bold"
+                        android:text="Close"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/search_bar"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/for_window"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:contentDescription="@string/search"
+                        android:layout_height="20dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/black_search_24" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 

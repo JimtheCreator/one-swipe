@@ -3,15 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-permission
-        android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- Add the queries declaration to enable querying activities -->
     <queries>
         <!-- Specify the package names of the apps you intend to interact with -->
         <package android:name="com.miui.securitycenter" />
@@ -20,6 +21,10 @@
         <package android:name="com.huawei.systemmanager" />
         <!-- Add more packages if needed -->
     </queries>
+
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission"
+        />
 
     <application
         android:allowBackup="true"
@@ -32,12 +37,20 @@
         android:theme="@style/Theme.ShortCuts"
         tools:targetApi="31">
         <activity
-            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:name="credit.CreditActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="intro.IntroPageActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".SearchWindowActivity"
             android:exported="false"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
-            android:taskAffinity="mappedvision.shortcuts.net.search_window" />
+            android:taskAffinity="mappedvision.shortcuts.net.search_window"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
@@ -75,7 +88,8 @@
             android:foregroundServiceType="dataSync"
             android:name="services.ShortcutService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            tools:ignore="ExportedService" />
 
     </application>
 

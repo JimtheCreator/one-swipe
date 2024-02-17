@@ -4,4 +4,13 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+
+    <!-- res/values/styles.xml -->
+    <style name="DarkTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize attributes for dark mode -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/offwhite</item>
+        <!-- Add more attributes as needed -->
+    </style>
 </resources>

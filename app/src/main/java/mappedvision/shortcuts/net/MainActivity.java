@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
@@ -14,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -23,22 +23,19 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
@@ -47,7 +44,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -56,43 +55,45 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionManager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import intro.IntroPageActivity;
 import model.ItemDecorator;
+import model.JustInfoApps;
+import model.SearchedApp;
 import services.ShortcutService;
+import utils.PreforSearch;
 import utils.SharedPrefUtils;
 import utils.UsageStatsHelper;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int FRAME_RATE = 16; // Frame rate in milliseconds
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String THEME_KEY = "theme";
+    private static final String SIZE_NAME = "SeekBar";
+    private static final String SIZE_KEY = "size";
     BottomSheetBehavior bottomSheetBehavior;
     MyAdapter adapter;
+    ImageView stretch;
     int screenHeight;
-    // Declare a variable to store the last slide offset
-    float lastSlideOffset = 0f;
-    boolean hasIllustrated  = false;
+    boolean hasIllustrated;
     boolean hasExecuted = false;
-
-    TextView mostTxt, othertxt;
+    boolean isChecked;
+    TextView mostTxt, othertxt, most;
     OtherAdapter otherAdapter;
     ProgressBar progress;
     Handler handler = new Handler();
-    RelativeLayout floatingBall, guide, close, pointer;
-    LinearLayout issueslayout, battery, themainthing, displayoverapps, list, viewHolder, settings;
+    RelativeLayout floatingBall;
+    LinearLayout issueslayout, battery, themainthing, displayoverapps, list, viewHolder, settings, holder;
     ViewGroup viewGroup;
-    TextView label_top, label_bottom;
-
     private final ActivityResultLauncher<Intent> requestOverlayPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     new ActivityResultCallback<ActivityResult>() {
@@ -109,12 +110,17 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     });
+    CoordinatorLayout mainroot;
+    TextView label_top, label_bottom;
     RecyclerView listView, otherslist;
     NestedScrollView nest;
+    AlertDialog alertDialog;
+    String seekBarprogress;
 
     @Override
     protected void onStart() {
         super.onStart();
+
         if (!UsageStatsHelper.isUsageAccessPermissionGranted(getApplicationContext())) {
             startActivity(new Intent(getApplicationContext(), PermissionActivity.class));
         } else {
@@ -122,23 +128,15 @@ public class MainActivity extends AppCompatActivity {
             if (pm != null && pm.isIgnoringBatteryOptimizations(getPackageName())
                     && Settings.canDrawOverlays(getApplicationContext())
                     && UsageStatsHelper.isUsageAccessPermissionGranted(getApplicationContext())) {
-                battery.setVisibility(View.GONE);
-                displayoverapps.setVisibility(View.GONE);
-                issueslayout.setVisibility(View.GONE);
-                themainthing.setVisibility(View.VISIBLE);
-                nest.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.offwhite_corners));
-
-                // The permission is granted
-                Intent intent = new Intent(getApplicationContext(), ShortcutService.class);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(intent);
-                } else {
-                    startService(intent);
-                }
+//                battery.setVisibility(View.GONE);
+//                displayoverapps.setVisibility(View.GONE);
+//                issueslayout.setVisibility(View.GONE);
+//                themainthing.setVisibility(View.VISIBLE);
+                onResume();
+                applyTheme();
             }
         }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,16 +145,32 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences prefs = getSharedPreferences(SIZE_NAME, MODE_PRIVATE);
+        seekBarprogress = prefs.getString(SIZE_KEY, "none");
+
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.newprogressbar, (ViewGroup) findViewById(R.id.progressID));
+
+        TextView text = (TextView) layout.findViewById(R.id.analyze);
+        text.setText("Setting up home...");
+
+        alertDialog = new AlertDialog.Builder(this)
+                .setView(layout)
+                .setCancelable(false) // This makes the AlertDialog non-dismissable
+                .create();
 
         SharedPreferences pref = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         hasIllustrated = pref.getBoolean("Seen", false);
 
+        SharedPreferences preference = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        isChecked = preference.getBoolean("Checked", false);
+
+        most = findViewById(R.id.most);
+        holder = findViewById(R.id.holder);
+        mainroot = findViewById(R.id.mainroot);
         screenHeight = getResources().getDisplayMetrics().heightPixels;
-        guide = findViewById(R.id.guide);
         displayoverapps = findViewById(R.id.displayoverapps);
-        pointer = findViewById(R.id.pointer);
         settings = findViewById(R.id.settings);
-        close = findViewById(R.id.close);
         label_top = findViewById(R.id.label_top);
         label_bottom = findViewById(R.id.label_bottom);
         viewHolder = findViewById(R.id.viewHolder);
@@ -191,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         bottomSheetBehavior = BottomSheetBehavior.from(nest);
-        final ImageView stretch = findViewById(R.id.stretch);
+        stretch = findViewById(R.id.stretch);
         final float scaleFactor = 1.1f; // Adjust the scaling factor as needed
 
         // Create ObjectAnimators for scaling
@@ -231,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
                 PropertyValuesHolder.ofFloat(View.SCALE_X, scaleFactor),
                 PropertyValuesHolder.ofFloat(View.SCALE_Y, scaleFactor)
         );
+
         inflateS.setInterpolator(new AccelerateDecelerateInterpolator());
 
         ObjectAnimator deflateS = ObjectAnimator.ofPropertyValuesHolder(
@@ -279,23 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                Log.d("SCREEN", " FLOAT "+ slideOffset);
-//                if (slideOffset > 0.5) {
-//                    // The bottom sheet is being dragged upwards
-//                    TransitionManager.beginDelayedTransition(viewGroup);
-//                    label_top.setTextSize(y);
-//                    label_bottom.setVisibility(View.VISIBLE);
-//                    settings.setVisibility(View.VISIBLE);
-//                } else if (slideOffset < 0.5) {
-//                    // The bottom sheet is being dragged downwards
-//                    TransitionManager.beginDelayedTransition(viewGroup);
-//                    label_top.setTextSize(x);
-//                    label_bottom.setVisibility(View.GONE);
-//                    settings.setVisibility(View.GONE);
-//                }
-//
-//                // Update the last slide offset
-//                lastSlideOffset = slideOffset;
+                Log.d("SCREEN", " FLOAT " + slideOffset);
             }
         });
 
@@ -324,8 +323,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         // This callback will only be called when MyActivity is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -339,12 +336,64 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-
         getOnBackPressedDispatcher().addCallback(this, callback);
 
         puthingstonull();
 
         settings.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), SettingsActivity.class)));
+    }
+
+    private void applyTheme() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean darkThemeEnabled = prefs.getBoolean(THEME_KEY, false);
+
+        if (darkThemeEnabled) {
+            changeTHEME();
+        } else {
+            nest.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.offwhite_corners));
+        }
+    }
+
+    private void changeTHEME() {
+        // Change status bar color
+        Window window = getWindow();
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.niceBlack)); // Change to your desired color
+        window.setNavigationBarColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+        View view = getWindow().getDecorView();
+
+        if (view != null) {
+            view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+
+        TextView settingstxt = findViewById(R.id.settingstxt);
+        TextView other_apps = findViewById(R.id.other_apps);
+        TextView hold = findViewById(R.id.hold);
+        LinearLayout theme = findViewById(R.id.theme);
+        ImageView settingtype = findViewById(R.id.settingtype);
+        RelativeLayout boxtwo = findViewById(R.id.boxtwo);
+        RelativeLayout boxone = findViewById(R.id.boxone);
+        LinearLayout oko = findViewById(R.id.oko);
+        TextView llaal = findViewById(R.id.llaal);
+
+        boxone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_shape));
+        boxtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_shape));
+        settingtype.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.baseline_settings_24));
+        hold.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        theme.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+        other_apps.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        llaal.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        label_bottom.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.thickGrey));
+        settingstxt.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        most.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        oko.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+        holder.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.coolDeepBlack));
+        mainroot.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.niceBlack));
+        nest.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.home));
+        floatingBall.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.cool_circle));
+        stretch.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.faded_add_24));
+        label_top.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+
     }
 
 
@@ -356,17 +405,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void puthingstonull() {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm != null && pm.isIgnoringBatteryOptimizations(getPackageName())
+                && Settings.canDrawOverlays(getApplicationContext())
+                && UsageStatsHelper.isUsageAccessPermissionGranted(getApplicationContext())) {
+            setUp();
+        }
+
         // The permission is already granted, proceed with your logic
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(() -> {
             // Call the method that requires API level 21 or higher
             List<UsageStats> usageStatsList = getUsageStatsList(MainActivity.this);
-            List<AppInfo> appList = new ArrayList<>();
-            Set<String> addedPackages = new HashSet<>();
 
-            List<UsageStats> otherstats = getOverallStats(MainActivity.this);
-            List<AppInfo> appListwo = new ArrayList<>();
-            Set<String> addedPackagestwo = new HashSet<>();
+            List<JustInfoApps> appList = new ArrayList<>();
+            reverseAppInfoListAlphabetically(appList);
+            Set<String> addedPackages = new HashSet<>();
+            List<SearchedApp> appSearch = get();
+            List<JustInfoApps> appListwo = getAllInstalledApps();
 
             // Do something here on the main thread
             for (UsageStats usageStats : usageStatsList) {
@@ -379,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
                             && !addedPackages.contains(usageStats.getPackageName())) {
                         String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
                         Drawable appIcon = packageInfo.applicationInfo.loadIcon(getPackageManager());
-                        appList.add(new AppInfo(appName, usageStats.getPackageName(), appIcon));
+                        appList.add(new JustInfoApps(usageStats.getPackageName(), packageInfo.applicationInfo.icon));
                         addedPackages.add(usageStats.getPackageName());
                     }
                 } catch (PackageManager.NameNotFoundException e) {
@@ -387,49 +443,113 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            // Update UI components with retrieved data
+            List<SearchedApp> existingAppList = PreforSearch.getAppInfoList(getApplicationContext());
 
-            // Create a custom adapter
-            adapter = new MyAdapter(appList, MainActivity.this);
+            // Create a set to store package names of existing apps for faster lookup
+            Set<String> existingPackageNames = new HashSet<>();
+            for (SearchedApp existingApp : existingAppList) {
+                existingPackageNames.add(existingApp.getPackageName());
+            }
 
-            for (UsageStats usageStats : otherstats) {
-                try {
-                    Log.d("BIGG", "LISTS " + appList);
-                    PackageInfo packageInfo = getPackageManager().getPackageInfo(usageStats.getPackageName(), 0);
-                    boolean isUserApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0;
-                    boolean isUpdatedSystemApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
-                    if ((isUserApp || isUpdatedSystemApp)
-                            && !usageStats.getPackageName().equals(getPackageName())
-                            && !addedPackagestwo.contains(usageStats.getPackageName())
-                            && !appList.contains(usageStats.getPackageName())) {
-                        String appName = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
-                        Drawable appIcon = packageInfo.applicationInfo.loadIcon(getPackageManager());
-                        appListwo.add(new AppInfo(appName, usageStats.getPackageName(), appIcon));
-                        addedPackagestwo.add(usageStats.getPackageName());
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
+            // Iterate over newly retrieved appSearch list
+            for (SearchedApp app : appSearch) {
+                // Check if the package name of the current app already exists in SharedPreferences
+                if (!existingPackageNames.contains(app.getPackageName())) {
+                    PreforSearch.addItem(getApplicationContext(), app);
+
+                    // If not, add it to SharedPreferences
+                    // Also, add it to the existingAppList to avoid adding duplicates again
+                    existingAppList.add(app);
+                    // Update the existingPackageNames set for faster lookup
+                    existingPackageNames.add(app.getPackageName());
+
                 }
             }
 
-            otherAdapter = new OtherAdapter(appListwo, MainActivity.this);
-
             hasExecuted = true;
 
+            // Main thread updates
             runOnUiThread(() -> {
-                viewHolder.setVisibility(View.VISIBLE);
-                progress.setVisibility(View.GONE);
-                mostTxt.setText(String.valueOf(appList.size()));
-                TransitionManager.beginDelayedTransition(viewGroup);
-                listView.setAdapter(adapter);
-                otherslist.setAdapter(otherAdapter);
-                othertxt.setText(String.valueOf(appListwo.size()));
-                otherAdapter.notifyDataSetChanged();
-                adapter.notifyDataSetChanged();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog.dismiss();
+                    }
+                }, 2500);
+
+                // Update UI components with retrieved data
+                updateUI(appList, appListwo);
             });
         });
-
-
     }
+
+    // Method to update UI components
+    private void updateUI(List<JustInfoApps> usageStatsList, List<JustInfoApps> appList) {
+        // Update the first adapter
+        // Create a custom adapter
+        adapter = new MyAdapter(usageStatsList, MainActivity.this);
+        otherAdapter = new OtherAdapter(appList, MainActivity.this);
+
+        viewHolder.setVisibility(View.VISIBLE);
+        progress.setVisibility(View.GONE);
+        mostTxt.setText(String.valueOf(usageStatsList.size()));
+        TransitionManager.beginDelayedTransition(viewGroup);
+        listView.setAdapter(adapter);
+        otherslist.setAdapter(otherAdapter);
+        othertxt.setText(String.valueOf(appList.size()));
+        otherAdapter.notifyItemChanged(0);
+        adapter.notifyItemInserted(0);
+    }
+
+    private List<JustInfoApps> getAllInstalledApps() {
+        List<JustInfoApps> appList = new ArrayList<>();
+        List<SearchedApp> search = new ArrayList<>();
+        PackageManager packageManager = getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
+
+        // Get the package name of your own app
+        String myPackageName = getPackageName();
+
+        for (ResolveInfo resolveInfo : activities) {
+            String packageName = resolveInfo.activityInfo.packageName;
+
+            // Exclude your own app by comparing package names
+            if (!packageName.equals(myPackageName)) {
+                String appName = resolveInfo.loadLabel(packageManager).toString();
+                int iconResource = resolveInfo.activityInfo.icon;
+                appList.add(new JustInfoApps(packageName, iconResource));
+            }
+        }
+
+        return appList;
+    }
+
+
+    private List<SearchedApp> get() {
+        List<SearchedApp> search = new ArrayList<>();
+        PackageManager packageManager = getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
+
+        // Get the package name of your own app
+        String myPackageName = getPackageName();
+
+        for (ResolveInfo resolveInfo : activities) {
+            String packageName = resolveInfo.activityInfo.packageName;
+
+            // Exclude your own app by comparing package names
+            String appName = resolveInfo.loadLabel(packageManager).toString();
+            int iconResource = resolveInfo.activityInfo.icon;
+            search.add(new SearchedApp(appName, packageName, resolveInfo.activityInfo.icon));
+        }
+
+        return search;
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private List<UsageStats> getUsageStatsList(Context context) {
@@ -449,19 +569,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return unusedAppsStats;
-    }
-
-    private List<UsageStats> getOverallStats(Context context) {
-        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        long endTime = calendar.getTimeInMillis();
-        calendar.add(Calendar.YEAR, -1);
-        long startTime = calendar.getTimeInMillis();
-
-        List<UsageStats> usageStatsList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime);
-
-        // Return the complete list of usage stats (including used and unused apps)
-        return usageStatsList;
     }
 
     private void vibrate() {
@@ -490,77 +597,101 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (pm != null && pm.isIgnoringBatteryOptimizations(getPackageName()) && Settings.canDrawOverlays(getApplicationContext())) {
-                if (!hasIllustrated){
-                    guide.setVisibility(View.VISIBLE);
-                    // Define the animation
-                    TranslateAnimation bounceAnimation = new TranslateAnimation(0, 0, 0, 100);
-                    bounceAnimation.setDuration(1000);
-                    bounceAnimation.setInterpolator(new BounceInterpolator());
-                    bounceAnimation.setRepeatCount(Animation.INFINITE);
-                    bounceAnimation.setRepeatMode(Animation.REVERSE);
+                TransitionManager.beginDelayedTransition(viewGroup);
+                issueslayout.setVisibility(View.GONE);
 
-                    // Start the animation
-                    pointer.startAnimation(bounceAnimation);
-
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            TransitionManager.beginDelayedTransition(viewGroup);
-                            close.setVisibility(View.VISIBLE);
+                if (!hasIllustrated) {
+                    openDialog();
+                    return;
+                } else {
+                    if (!seekBarprogress.equals("0")) {
+                        Intent intent = new Intent(getApplicationContext(), ShortcutService.class);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(intent);
+                        } else {
+                            startService(intent);
                         }
-                    }, 2000);
-
-                    close.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // Initialize SharedPreferences
-                            SharedPreferences.Editor pref = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE).edit();
-                            pref.putBoolean("Seen", true);
-                            pref.apply();
-
-                            guide.setVisibility(View.GONE);
-                        }
-                    });
-
+                    } else {
+                        // From an Activity
+                        Intent stopIntent = new Intent(this, ShortcutService.class);
+                        stopService(stopIntent);
+                    }
                 }
 
-                else {
-                    guide.setVisibility(View.GONE);
-                }
 
                 TransitionManager.beginDelayedTransition(viewGroup);
-                battery.setVisibility(View.GONE);
-                displayoverapps.setVisibility(View.GONE);
-                issueslayout.setVisibility(View.GONE);
                 themainthing.setVisibility(View.VISIBLE);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private static class AppInfo {
-        String name, packagename;
-        Drawable icon;
+    private void openDialog() {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.newprogressbar, (ViewGroup) findViewById(R.id.progressID));
 
-        AppInfo(String name, String packagename, Drawable icon) {
-            this.name = name;
-            this.packagename = packagename;
-            this.icon = icon;
+//        ImageView image = (ImageView) layout.findViewById(R.id.image);
+//        image.setImageResource(R.drawable.android); // replace with your own image resource
+//
+//        TextView text = (TextView) layout.findViewById(R.id.text);
+//        text.setText("Hello! This is a custom AlertDialog!");
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(layout)
+                .setCancelable(false) // This makes the AlertDialog non-dismissable
+                .create();
+
+        // Perform null check on the window
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
+
+        alertDialog.show();
+
+        handler.postDelayed(() -> {
+            alertDialog.dismiss();
+            handler.removeCallbacksAndMessages(null);
+            startActivity(new Intent(getApplicationContext(), IntroPageActivity.class));
+        }, 2200);
+
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+    private void setUp() {
+        // Perform null check on the window
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
 
-        List<AppInfo> appn;
+        alertDialog.show();
+    }
+
+    public void reverseAppInfoListAlphabetically(List<JustInfoApps> appInfoList) {
+        // Sort the list based on package name in ascending order
+        appInfoList.sort((app1, app2) -> app1.getPackageName().compareToIgnoreCase(app2.getPackageName()));
+
+        // Reverse the sorted list
+        Collections.reverse(appInfoList);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
+    }
+
+    private static class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+
+        private static final String SIZE_NAME = "SeekBar";
+        private static final String SIZE_KEY = "size";
+        List<JustInfoApps> appn;
         Context context;
-
+        String seekBarprogress;
         // Constructor to initialize the adapter with data
 
 
-        public MyAdapter(List<AppInfo> appn, Context context) {
+        public MyAdapter(List<JustInfoApps> appn, Context context) {
             this.appn = appn;
             this.context = context;
         }
@@ -576,39 +707,40 @@ public class MainActivity extends AppCompatActivity {
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            AppInfo appInfo = appn.get(position);
+            JustInfoApps appInfo = appn.get(position);
 
-//            holder.maincontainer.setBackgroundColor(ContextCompat.getColor(context, R.color.invicibleColor));
+            SharedPreferences prefs = context.getSharedPreferences(SIZE_NAME, MODE_PRIVATE);
+            seekBarprogress = prefs.getString(SIZE_KEY, "none");
 
-            //holder.textView.setText(appInfo.name);
-            holder.appIcon.setImageDrawable(appInfo.icon);
-            String textToDisplay = appInfo.name;
 
-            // Set the maximum length to 5 characters
-            int maxLength = 4;
+            holder.appIcon.setImageDrawable(appInfo.getAppIcon(context));
 
-            // Check if the text exceeds the maximum length
-            if (textToDisplay.length() > maxLength) {
-                // Truncate the text and append ellipsis
-                String truncatedText = textToDisplay.substring(0, maxLength) + "...";
-                holder.appname.setText(truncatedText);
-            } else {
-                // Display the original text if it doesn't exceed the maximum length
-                holder.appname.setText(textToDisplay);
+
+            checkstate(holder.checked, appInfo.getPackageName(), context);
+
+
+            if (seekBarprogress.equals("0")) {
+                holder.shadow.setVisibility(View.VISIBLE);
             }
 
-            checkstate(holder.checked, appInfo.packagename, context);
-
-
-            Log.d("List of apps", ""+ SharedPrefUtils.getStringArray(context));
             holder.itemView.setOnClickListener(v -> {
-                Log.d("List of apps", ""+ SharedPrefUtils.getStringArray(context));
-                if (SharedPrefUtils.getStringArray(context).contains(appInfo.packagename)) {
-                    removeapp(appInfo.packagename, holder.checked);
-                }else {
-                    uploadApptoServer(appInfo.packagename, holder.checked, context);
+                if (seekBarprogress.equals("0")) {
+                    showToast("Sensitivity is OFF");
+                    return;
+                }
+
+                List<JustInfoApps> appInfoList = SharedPrefUtils.getAppInfoList(context);
+
+                if (appInfoList != null && appInfoList.stream().anyMatch(storedAppInfo ->
+                        storedAppInfo.getPackageName().equals(appInfo.getPackageName()))) {
+                    // Package name exists in the list
+                    removeapp(appInfo, holder.checked);
+                } else {
+                    // Package name does not exist in the list
+                    uploadApptoServer(appInfo, holder.checked, context);
                 }
             });
+
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -617,57 +749,85 @@ public class MainActivity extends AppCompatActivity {
             return appn.size();
         }
 
+        private void uploadApptoServer(JustInfoApps packagename, ImageView checked, Context context) {
+            SharedPrefUtils.addItem(context, packagename);
+            checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.blue_checkbox));
+        }
+
+        private void checkstate(ImageView checked, String packageName, Context context) {
+            List<JustInfoApps> appInfoList = SharedPrefUtils.getAppInfoList(context);
+            Drawable drawable;
+
+            if (appInfoList != null && appInfoList.stream().anyMatch(appInfo -> appInfo.getPackageName().equals(packageName))) {
+                // Package name exists in the list
+                drawable = ContextCompat.getDrawable(context, R.drawable.blue_checkbox);
+            } else {
+                // Package name does not exist in the list
+                if (state()) {
+                    drawable = ContextCompat.getDrawable(context, R.drawable.darktheme_check_box_outline_blank_24);
+
+                } else {
+                    drawable = ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24);
+                }
+            }
+
+            checked.setImageDrawable(drawable);
+
+        }
+
+
+        private void removeapp(JustInfoApps packagename, ImageView checked) {
+            if (state()){
+                checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.darktheme_check_box_outline_blank_24));
+            }else {
+                checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
+            }
+            SharedPrefUtils.removeAppInfo(context, packagename);
+        }
+
+        private boolean state() {
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            boolean darkThemeEnabled = prefs.getBoolean(THEME_KEY, false);
+
+            return darkThemeEnabled;
+        }
+
+        private void showToast(String message){
+            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER,0,0);
+            toast.show();
+        }
+
         // Provide a reference to the views for each data item
-        class ViewHolder extends RecyclerView.ViewHolder {
+        static class ViewHolder extends RecyclerView.ViewHolder {
             //TextView textView;
             ImageView appIcon, checked;
-            TextView appname, state;
-//            RelativeLayout maincontainer;
+            RelativeLayout shadow;
 
             ViewHolder(View itemView) {
                 super(itemView);
 //                textView = itemView.findViewById(R.id.appName);
                 appIcon = itemView.findViewById(R.id.appIcon);
-//                maincontainer = itemView.findViewById(R.id.maincontainer);
+                shadow = itemView.findViewById(R.id.shadow);
                 checked = itemView.findViewById(R.id.checked);
-                appname = itemView.findViewById(R.id.appname);
 //                state = itemView.findViewById(R.id.state);
             }
         }
 
-        private void uploadApptoServer(String packagename, ImageView checked, Context context) {
-            SharedPrefUtils.addItem(context, packagename);
-            checked.setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.blue_checkbox));
-        }
-
-        private void checkstate(ImageView checked, String packagename,Context context) {
-            if (SharedPrefUtils.getStringArray(context) != null){
-                if (SharedPrefUtils.getStringArray(context).contains(packagename)){
-                    checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.blue_checkbox));
-                }else {
-                    checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
-                }
-            }else {
-                checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
-            }
-
-        }
-
-        private void removeapp(String packagename, ImageView checked) {
-            checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
-            SharedPrefUtils.removeItem(getApplicationContext(), packagename);
-        }
-
     }
 
-    private class OtherAdapter extends RecyclerView.Adapter<OtherAdapter.ViewHolder> {
+    private static class OtherAdapter extends RecyclerView.Adapter<OtherAdapter.ViewHolder> {
 
-        List<AppInfo> appn;
+        private static final String SIZE_NAME = "SeekBar";
+        private static final String SIZE_KEY = "size";
+        List<JustInfoApps> appn;
         Context context;
+        String seekBarprogress;
+
 
         // Constructor to initialize the adapter with data
 
-        public OtherAdapter(List<AppInfo> appn, Context context) {
+        public OtherAdapter(List<JustInfoApps> appn, Context context) {
             this.appn = appn;
             this.context = context;
         }
@@ -683,38 +843,37 @@ public class MainActivity extends AppCompatActivity {
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            AppInfo appInfo = appn.get(position);
+            JustInfoApps appInfo = appn.get(position);
 
-//            holder.maincontainer.setBackgroundColor(ContextCompat.getColor(context, R.color.invicibleColor));
+            SharedPreferences prefs = context.getSharedPreferences(SIZE_NAME, MODE_PRIVATE);
+            seekBarprogress = prefs.getString(SIZE_KEY, "none");
 
-            //holder.textView.setText(appInfo.name);
-            holder.appIcon.setImageDrawable(appInfo.icon);
-            String textToDisplay = appInfo.name;
+            holder.appIcon.setImageDrawable(appInfo.getAppIcon(context));
 
-            // Set the maximum length to 5 characters
-            int maxLength = 2;
+            checkstate(holder.checked, appInfo.getPackageName(), context);
 
-            // Check if the text exceeds the maximum length
-            if (textToDisplay.length() > maxLength) {
-                // Truncate the text and append ellipsis
-                String truncatedText = textToDisplay.substring(0, maxLength) + "..";
-                holder.appname.setText(truncatedText);
-            } else {
-                // Display the original text if it doesn't exceed the maximum length
-                holder.appname.setText(textToDisplay);
+            if (seekBarprogress.equals("0")) {
+                holder.shadow.setVisibility(View.VISIBLE);
             }
 
-            checkstate(holder.checked, appInfo.packagename, context);
-
-
             holder.itemView.setOnClickListener(v -> {
-                Log.d("List of apps", ""+ SharedPrefUtils.getStringArray(context));
-                if (SharedPrefUtils.getStringArray(context).contains(appInfo.packagename)) {
-                    removeapp(appInfo.packagename, holder.checked);
-                }else {
-                    uploadApptoServer(appInfo.packagename, holder.checked, context);
+                if (seekBarprogress.equals("0")) {
+                    showToast("Sensitivity is OFF");
+                    return;
+                }
+
+                List<JustInfoApps> appInfoList = SharedPrefUtils.getAppInfoList(context);
+
+                if (appInfoList != null && appInfoList.stream().anyMatch(storedAppInfo ->
+                        storedAppInfo.getPackageName().equals(appInfo.getPackageName()))) {
+                    // Package name exists in the list
+                    removeapp(appInfo, holder.checked);
+                } else {
+                    // Package name does not exist in the list
+                    uploadApptoServer(appInfo, holder.checked, context);
                 }
             });
+
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -723,49 +882,69 @@ public class MainActivity extends AppCompatActivity {
             return appn.size();
         }
 
+        private void uploadApptoServer(JustInfoApps packagename, ImageView checked, Context context) {
+            SharedPrefUtils.addItem(context, packagename);
+            checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.blue_checkbox));
+        }
+
+        private void checkstate(ImageView checked, String packageName, Context context) {
+            List<JustInfoApps> appInfoList = SharedPrefUtils.getAppInfoList(context);
+            Drawable drawable;
+
+            if (appInfoList != null && appInfoList.stream().anyMatch(appInfo -> appInfo.getPackageName().equals(packageName))) {
+                // Package name exists in the list
+                drawable = ContextCompat.getDrawable(context, R.drawable.blue_checkbox);
+            } else {
+                // Package name does not exist in the list
+
+                if (state()) {
+                    drawable = ContextCompat.getDrawable(context, R.drawable.darktheme_check_box_outline_blank_24);
+                } else {
+                    drawable = ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24);
+                }
+            }
+
+            checked.setImageDrawable(drawable);
+
+        }
+
+        private void removeapp(JustInfoApps packagename, ImageView checked) {
+            if (state()){
+                checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.darktheme_check_box_outline_blank_24));
+            }else {
+                checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
+            }
+            SharedPrefUtils.removeAppInfo(context, packagename);
+        }
+
+        private boolean state() {
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            boolean darkThemeEnabled = prefs.getBoolean(THEME_KEY, false);
+
+
+            return darkThemeEnabled;
+        }
+
+        private void showToast(String message){
+            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER,0,0);
+            toast.show();
+        }
+
         // Provide a reference to the views for each data item
-        class ViewHolder extends RecyclerView.ViewHolder {
+        static class ViewHolder extends RecyclerView.ViewHolder {
             //TextView textView;
             ImageView appIcon, checked;
-            TextView appname;
-//            RelativeLayout maincontainer;
+            RelativeLayout shadow;
 
             ViewHolder(View itemView) {
                 super(itemView);
 //                textView = itemView.findViewById(R.id.appName);
                 appIcon = itemView.findViewById(R.id.appIcon);
-//                maincontainer = itemView.findViewById(R.id.maincontainer);
+                shadow = itemView.findViewById(R.id.shadow);
                 checked = itemView.findViewById(R.id.checked);
-                appname = itemView.findViewById(R.id.appname);
             }
-        }
-
-        private void uploadApptoServer(String packagename, ImageView checked, Context context) {
-            SharedPrefUtils.addItem(context, packagename);
-            checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.blue_checkbox));
-        }
-
-        private void checkstate(ImageView checked, String packagename,Context context) {
-            if (SharedPrefUtils.getStringArray(context) != null){
-                if (SharedPrefUtils.getStringArray(context).contains(packagename)){
-                    checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.blue_checkbox));
-                }else {
-                    checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
-                }
-            }else {
-                checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
-            }
-        }
-
-        private void removeapp(String packagename, ImageView checked) {
-            checked.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.baseline_check_box_outline_blank_24));
-            SharedPrefUtils.removeItem(getApplicationContext(), packagename);
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
 }

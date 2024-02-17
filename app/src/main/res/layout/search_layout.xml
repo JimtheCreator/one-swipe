@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#90000000"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <LinearLayout
         android:orientation="vertical"
@@ -50,94 +51,78 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="20dp"
+    <RelativeLayout
+        android:id="@+id/sheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/dark_shape_translucent"
+        android:fitsSystemWindows="true"
+        android:padding="2dp">
 
-
-        <RelativeLayout
-            android:id="@+id/close_window"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/white_circle">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="15dp"
-                android:src="@drawable/baseline_close_24"
-                app:tint="@color/black" />
-
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:id="@+id/see"
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_bar"
+            style="@style/CustomSearchViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/dark_shape_translucent">
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search" />
 
 
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/xbn"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content">-->
 
-            <LinearLayout
-                android:id="@+id/xbn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_toStartOf="@+id/drop_down">
+        <!--            <ImageView-->
+        <!--                android:layout_width="30dp"-->
+        <!--                android:layout_height="30dp"-->
+        <!--                android:layout_gravity="center_vertical"-->
+        <!--                android:src="@drawable/baseline_search_24" />-->
 
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/baseline_search_24" />
+        <!--            <EditText-->
+        <!--                android:id="@+id/EditText"-->
+        <!--                android:layout_width="0dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginStart="15dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:background="@color/invincibleColor"-->
+        <!--                android:hint="Search"-->
+        <!--                android:textColor="@color/white"-->
+        <!--                android:inputType="text"-->
+        <!--                android:layout_gravity="clip_vertical"-->
+        <!--                android:textColorHint="@color/offwhite" />-->
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="15dp"
-                    android:background="@color/invincibleColor"
-                    android:hint="Search"
-                    android:textColor="@color/white"
-                    android:textColorHint="@color/thickGrey" />
+        <!--        </LinearLayout>-->
 
-            </LinearLayout>
+        <!--        <RelativeLayout-->
+        <!--            android:id="@+id/drop_down"-->
+        <!--            android:layout_width="30dp"-->
+        <!--            android:layout_height="30dp"-->
+        <!--            android:layout_alignParentEnd="true"-->
+        <!--            android:layout_centerVertical="true"-->
+        <!--            android:layout_marginEnd="10dp"-->
+        <!--            android:background="@drawable/white_circle">-->
 
-            <RelativeLayout
-                android:id="@+id/drop_down"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/white_circle">
+        <!--            <ImageView-->
+        <!--                android:layout_width="25dp"-->
+        <!--                android:layout_height="25dp"-->
+        <!--                android:layout_centerInParent="true"-->
+        <!--                android:layout_gravity="center_vertical"-->
+        <!--                android:layout_marginStart="15dp"-->
+        <!--                android:src="@drawable/baseline_close_24" />-->
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="15dp"
-                    android:src="@drawable/baseline_arrow_downward_24" />
+        <!--        </RelativeLayout>-->
 
-            </RelativeLayout>
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
+    </RelativeLayout>
 
 
 

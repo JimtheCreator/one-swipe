@@ -29,10 +29,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionManager;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,6 +50,9 @@ import java.util.concurrent.Executors;
 
 import decor.ParallaxItemDecoration;
 import mappedvision.shortcuts.net.R;
+import mappedvision.shortcuts.net.SearchWindowActivity;
+import model.JustInfoApps;
+import services.ShortcutService;
 import utils.SharedPrefUtils;
 
 public class Window {
@@ -54,18 +60,16 @@ public class Window {
     // declaring required variables
     private final Context context;
     private final View mView;
-    TextView instructions;
-    LinearLayout search_bar, base_root;
-
-    RecentAdapter recentAdapter;
     // Assuming that you have a reference to the main looper
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-
     private final WindowManager mWindowManager;
     private final LayoutInflater layoutInflater;
-    MyAdapter adapter;
+    TextView instructions;
+    LinearLayout base_root;
+    RecentAdapter recentAdapter;
+    AppInfoAdapter adapter;
     TextView toptitle;
-    RelativeLayout close;
+    RelativeLayout close, search_bar;
     TextView short_descr, title;
     ImageView savedpic;
     RecyclerView recyclerView, recent_recyclerView;
@@ -73,13 +77,16 @@ public class Window {
     Random random;
     ViewGroup root;
 
-    Handler getHandler= new Handler();
-    private WindowManager.LayoutParams mParams;
+    Handler getHandler = new Handler();
     LinearLayout container;
+    private WindowManager.LayoutParams mParams;
+    private AppInfoAdapter appInfoAdapter;
+    private List<JustInfoApps> appInfoList;
 
     @SuppressLint("CutPasteId")
     public Window(Context context) {
         this.context = context;
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // set the layout parameters of the window
@@ -124,31 +131,43 @@ public class Window {
             close();
         });
 
-        base_root.setOnClickListener(v ->{
+        base_root.setOnClickListener(v -> {
             close();
         });
 
         search_bar.setOnClickListener(v -> {
             // Handle click event
-//            closeNew();
+            closeNew();
 
-//            context.startActivity(new Intent(context, SearchWindowActivity.class)
-//                    .setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
-
-
-            showToast("Coming soon");
-
+            try {
+                Intent intent = new Intent(context, SearchWindowActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Handle the exception appropriately, perhaps by logging or displaying an error message.
+            }
         });
-
 
         int parallaxFactor = context.getResources().getDimensionPixelOffset(R.dimen.parallax_factor);
         recyclerView.setLayoutManager(new GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false));
         recyclerView.addItemDecoration(new ParallaxItemDecoration(parallaxFactor, 0));
 
         recent_recyclerView.setLayoutManager(new GridLayoutManager(context, 4));
-//        recent_recyclerView.setLayoutManager(new GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false));
         recent_recyclerView.addItemDecoration(new ParallaxItemDecoration(parallaxFactor, 0));
+
         puthingstonull();
+
+        appInfoList = SharedPrefUtils.getAppInfoList(context);
+        adapter = new AppInfoAdapter(context, appInfoList);
+
+        if (appInfoList.size() > 4) {
+            instructions.setText("(Scroll left for more)");
+        }
+
+        recyclerView.setAdapter(adapter);
+        adapter.notifyItemChanged(0);
+
 
         // Define the position of the
         // window within the screen
@@ -166,33 +185,9 @@ public class Window {
         // The permission is already granted, proceed with your logic
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(() -> {
-            List<UsageStats> usageStatsList = getUsageStatsList(context);
-            List<AppInfo> appList = new ArrayList<>();
-            Set<String> addedPackages = new HashSet<>();
-
             List<UsageStats> recentList = recentAppList(context);
             List<AppInfo> appListTwo = new ArrayList<>();
             Set<String> addedPackagesTwo = new HashSet<>();
-
-            for (UsageStats usageStats : usageStatsList) {
-                try {
-                    PackageInfo packageInfo = context.getPackageManager().getPackageInfo(usageStats.getPackageName(), 0);
-                    boolean isUserApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0;
-                    boolean isUpdatedSystemApp = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
-                    if ((isUserApp || isUpdatedSystemApp)
-                            && !usageStats.getPackageName().equals(context.getPackageName())
-                            && !addedPackages.contains(usageStats.getPackageName())
-                            && SharedPrefUtils.getStringArray(context).contains(usageStats.getPackageName())) {
-                        String appName = packageInfo.applicationInfo.loadLabel(context.getPackageManager()).toString();
-                        Drawable appIcon = packageInfo.applicationInfo.loadIcon(context.getPackageManager());
-                        appList.add(new AppInfo("", usageStats.getPackageName(), appIcon));
-                        addedPackages.add(usageStats.getPackageName());
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
 
             for (UsageStats usageStats : recentList) {
                 try {
@@ -214,51 +209,55 @@ public class Window {
 
 
             // Create a custom adapter
-            adapter = new MyAdapter(appList, context);
             recentAdapter = new RecentAdapter(appListTwo, context);
 
+//            updateUIOnMainThread();
 
-            updateUIOnMainThread(appList.size(), appListTwo.size());
+            updateUIOnMainThread(appListTwo.size());
         });
 
     }
 
-    private void updateUIOnMainThread(int size, int sized) {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (size>4){
-                    instructions.setText("(Scroll left for more)");
-                }
-
-                recyclerView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+    private void updateUIOnMainThread(int sized) {
+//        recyclerView.setAdapter(adapter);
+//        adapter.notifyDataSetChanged();
 
 
-                if (sized < 1){
-                    recent_recyclerView.setVisibility(View.GONE);
-                    title.setVisibility(View.GONE);
-                    return;
-                }
+//        if (sized < 1) {
+//            recent_recyclerView.setVisibility(View.GONE);
+//            title.setVisibility(View.GONE);
+//            return;
+//        }
+//
+//        recent_recyclerView.setAdapter(recentAdapter);
+//        recentAdapter.notifyItemChanged(0);
 
-                recent_recyclerView.setAdapter(recentAdapter);
-                recentAdapter.notifyDataSetChanged();
+        mainHandler.post(() -> {
+            if (sized < 1) {
+                recent_recyclerView.setVisibility(View.GONE);
+                title.setVisibility(View.GONE);
+                return;
             }
+
+            TransitionManager.beginDelayedTransition(root);
+            recent_recyclerView.setVisibility(View.VISIBLE);
+            title.setVisibility(View.VISIBLE);
+            recent_recyclerView.setAdapter(recentAdapter);
+            recentAdapter.notifyItemChanged(0);
         });
+
     }
 
-
-    private List<UsageStats> getUsageStatsList(Context context){
+    private List<UsageStats> getUsageStatsList(Context context) {
         UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar calendar = Calendar.getInstance();
         long endTime = calendar.getTimeInMillis();
         calendar.add(Calendar.YEAR, -1);
         long startTime = calendar.getTimeInMillis();
 
-        List<UsageStats> usageStatsList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,startTime,endTime);
+        List<UsageStats> usageStatsList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime);
         return usageStatsList;
     }
-
 
     public List<UsageStats> recentAppList(Context context) {
         UsageStatsManager usageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
@@ -311,13 +310,11 @@ public class Window {
             ((WindowManager) context.getSystemService(WINDOW_SERVICE)).removeView(mView);
             // invalidate the view
             mView.invalidate();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e("Error2", e.toString());
         }
 
     }
-
 
     public void close() {
         TransitionManager.beginDelayedTransition(root);
@@ -343,8 +340,7 @@ public class Window {
                     ((WindowManager) context.getSystemService(WINDOW_SERVICE)).removeView(mView);
                     // invalidate the view
                     mView.invalidate();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.e("Error2", e.toString());
                 }
 
@@ -352,6 +348,14 @@ public class Window {
 
             }
         }, 1000);
+    }
+
+    private void vibrate() {
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator != null) {
+            // Vibrate for 500 milliseconds
+            vibrator.vibrate(30);
+        }
     }
 
     private static class AppInfo {
@@ -530,7 +534,7 @@ public class Window {
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            if (appn.size() > 8){
+            if (appn.size() > 8) {
                 return 8;
             }
 
@@ -563,11 +567,75 @@ public class Window {
 
     }
 
-    private void vibrate() {
-        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator != null) {
-            // Vibrate for 500 milliseconds
-            vibrator.vibrate(30);
+    private class AppInfoAdapter extends RecyclerView.Adapter<AppInfoAdapter.ViewHolder> {
+        private List<JustInfoApps> appInfoList;
+        private Context context;
+
+        public AppInfoAdapter(Context context, List<JustInfoApps> appInfoList) {
+            this.context = context;
+            this.appInfoList = appInfoList;
         }
+
+        @NonNull
+        @Override
+        public AppInfoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recent_apps, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull AppInfoAdapter.ViewHolder holder, int position) {
+            JustInfoApps appInfo = appInfoList.get(position);
+            Drawable appIcon = appInfo.getAppIcon(context);
+
+            if (appIcon != null) {
+                holder.imageView.setImageDrawable(appIcon);
+            }
+
+
+            holder.itemView.setOnClickListener(v -> {
+                String packageName = appInfo.getPackageName();
+                openApp(packageName);
+            });
+        }
+
+        private void openApp(String packagename) {
+            try {
+                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
+                if (launchIntent != null) {
+                    close();
+                    context.startActivity(launchIntent);
+                } else {
+                    // The app is not installed on the device
+                    // You might want to handle this case accordingly
+                    showToast("App not found");
+                }
+            } catch (Exception e) {
+                // An exception occurred, handle it if needed
+                e.printStackTrace();
+            }
+
+        }
+
+        private void showToast(String message) {
+            Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, -350);
+            toast.show();
+        }
+
+        @Override
+        public int getItemCount() {
+            return appInfoList.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            ImageView imageView;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                imageView = itemView.findViewById(R.id.appIcon);
+            }
+        }
+
     }
 }
