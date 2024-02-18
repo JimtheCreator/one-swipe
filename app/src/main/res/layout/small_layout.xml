@@ -85,7 +85,8 @@
         android:layout_marginEnd="10dp"
         android:layout_width="60dp"
         android:layout_height="120dp"
-        android:background="#C0000000"/>
+        android:background="#C0000000"
+        />
 
 
 </RelativeLayout>

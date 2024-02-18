@@ -396,7 +396,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private void checkAndRequestOverlayPermission() {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + getPackageName()));
@@ -527,7 +526,6 @@ public class MainActivity extends AppCompatActivity {
         return appList;
     }
 
-
     private List<SearchedApp> get() {
         List<SearchedApp> search = new ArrayList<>();
         PackageManager packageManager = getPackageManager();
@@ -549,7 +547,6 @@ public class MainActivity extends AppCompatActivity {
 
         return search;
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private List<UsageStats> getUsageStatsList(Context context) {
@@ -720,7 +717,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             if (seekBarprogress.equals("0")) {
-                holder.shadow.setVisibility(View.VISIBLE);
+                if (state()){
+                    holder.shadow.setVisibility(View.VISIBLE);
+                    holder.shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDark));
+                }else {
+                    holder.shadow.setVisibility(View.VISIBLE);
+                    holder.shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.colorLight));
+                }
             }
 
             holder.itemView.setOnClickListener(v -> {
@@ -852,8 +855,15 @@ public class MainActivity extends AppCompatActivity {
 
             checkstate(holder.checked, appInfo.getPackageName(), context);
 
+
             if (seekBarprogress.equals("0")) {
-                holder.shadow.setVisibility(View.VISIBLE);
+                if (state()){
+                    holder.shadow.setVisibility(View.VISIBLE);
+                    holder.shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDark));
+                }else {
+                    holder.shadow.setVisibility(View.VISIBLE);
+                    holder.shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.colorLight));
+                }
             }
 
             holder.itemView.setOnClickListener(v -> {
@@ -921,7 +931,6 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
             boolean darkThemeEnabled = prefs.getBoolean(THEME_KEY, false);
 
-
             return darkThemeEnabled;
         }
 
@@ -945,6 +954,8 @@ public class MainActivity extends AppCompatActivity {
                 checked = itemView.findViewById(R.id.checked);
             }
         }
+
+
     }
 
 }

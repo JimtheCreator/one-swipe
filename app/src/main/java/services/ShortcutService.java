@@ -49,7 +49,7 @@ public class ShortcutService extends Service {
     private static final String CHANNEL_ID = "intercept";
     Long lastEventTime;
     private WindowManager leftwindowManager, rightwindowManager;
-    private View righttouchView, leftTouchView ;
+    private View righttouchView, leftTouchView;
     private GestureDetector gestureDetector, leftGesture;
     String name;
     Handler hh = new Handler();
@@ -139,7 +139,6 @@ public class ShortcutService extends Service {
 
             return true; // consume the touch event
         });
-
     }
 
     private void leftSwipe() {
@@ -191,7 +190,6 @@ public class ShortcutService extends Service {
         });
 
     }
-
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
