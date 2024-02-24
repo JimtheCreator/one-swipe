@@ -20,6 +20,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <queries>
         <!-- Specify the package names of the apps you intend to interact with -->
         <package android:name="com.miui.securitycenter" />
