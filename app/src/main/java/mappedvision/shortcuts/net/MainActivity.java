@@ -55,6 +55,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionManager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String SIZE_NAME = "SeekBar";
     private static final String SIZE_KEY = "size";
     BottomSheetBehavior bottomSheetBehavior;
+
+    FirebaseAnalytics firebaseAnalytics;
     MyAdapter adapter;
     ImageView stretch;
     int screenHeight;
@@ -94,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
     RelativeLayout floatingBall;
     LinearLayout issueslayout, battery, themainthing, displayoverapps, list, viewHolder, settings, holder;
     ViewGroup viewGroup;
+
     private final ActivityResultLauncher<Intent> requestOverlayPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    new ActivityResultCallback<ActivityResult>() {
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                         @Override
                         public void onActivityResult(ActivityResult result) {
                             if (Settings.canDrawOverlays(MainActivity.this)) {
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     });
+
     CoordinatorLayout mainroot;
     TextView label_top, label_bottom;
     RecyclerView listView, otherslist;
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        firebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         if (!UsageStatsHelper.isUsageAccessPermissionGranted(getApplicationContext())) {
             startActivity(new Intent(getApplicationContext(), PermissionActivity.class));
@@ -239,6 +244,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Start the animation
         animatorSet.start();
+
+
         // Create ObjectAnimators for scaling
         ObjectAnimator inflateS = ObjectAnimator.ofPropertyValuesHolder(
                 stretch,

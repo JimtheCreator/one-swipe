@@ -87,34 +87,98 @@
             android:textSize="25sp" />
 
 
-        <TextView
-            android:id="@+id/startText_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:fontFamily="@font/sanfrans_bold"
-            android:gravity="center_horizontal"
-            android:text="To quickly open your favourite apps. Swipe from the section shown below going rightwards"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            android:visibility="gone"
-            />
+        <!--        <TextView-->
+        <!--            android:id="@+id/startText_left"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_centerInParent="true"-->
+        <!--            android:layout_marginStart="20dp"-->
+        <!--            android:layout_marginEnd="20dp"-->
+        <!--            android:fontFamily="@font/sanfrans_bold"-->
+        <!--            android:gravity="center_horizontal"-->
+        <!--            android:text="To quickly open your favourite apps. Swipe from the section shown below going rightwards"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="22sp"-->
+        <!--            android:visibility="gone"-->
+        <!--            />-->
 
-        <TextView
-            android:id="@+id/startText_right"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:fontFamily="@font/sanfrans_bold"
             android:gravity="center_horizontal"
-            android:text="For a quick app search. Swipe from \nthe section shown below going leftwards"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/startText_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sanfrans_bold"
+                android:gravity="center_horizontal"
+                android:text="For a quick app search. You can swipe from the section shown below going leftwards"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/proceeding"
+                    android:layout_width="135dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/thicker_blue">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/sanfrans_bold"
+                        android:text="Next"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/donewithintro"
+                    android:layout_width="135dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/thicker_blue">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/sanfrans_bold"
+                        android:text="Done"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+
+                </RelativeLayout>
+
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
 
         <View
             android:id="@+id/rightview"
@@ -147,7 +211,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Great Job !!!"
+                android:text="That's not all..."
                 android:textColor="@color/white"
                 android:textSize="25sp" />
 

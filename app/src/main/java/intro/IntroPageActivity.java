@@ -1,5 +1,10 @@
 package intro;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,13 +42,13 @@ import utils.SharedPrefUtils;
 public class IntroPageActivity extends AppCompatActivity {
 
     View rightview, leftView;
-    private WindowManager windowManager;
+//    private WindowManager windowManager;
     TextView cache;
     private View touchView;
     ViewGroup rootView;
-    TextView startText_right, startText_left;
-    RelativeLayout congrats;
-    private GestureDetector gestureDetector, leftGesture;
+    TextView startText_right;
+    RelativeLayout congrats, proceeding, donewithintro;
+//    private GestureDetector gestureDetector, leftGesture;
     boolean flag = false;
 
     @Override
@@ -50,14 +56,17 @@ public class IntroPageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro_page);
 
+        donewithintro = findViewById(R.id.donewithintro);
         rootView = findViewById(R.id.rootView);
         leftView = findViewById(R.id.leftView);
         rightview = findViewById(R.id.rightview);
         startText_right = findViewById(R.id.startText_right);
         cache = findViewById(R.id.cache);
         congrats = findViewById(R.id.congrats);
-        startText_left = findViewById(R.id.startText_left);
+//        done = findViewById(R.id.done);
+        proceeding = findViewById(R.id.proceeding);
 
+        startBouncing();
 
         // Define the height you want programmatically
         int desiredHeightInPixels = getResources().getDisplayMetrics().heightPixels / 4; // Change this to whatever height you need
@@ -76,151 +85,38 @@ public class IntroPageActivity extends AppCompatActivity {
 
         startAnimation();
 
-        rightSwipe();
-
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
                 finishAffinity();
             }
         };
-    }
 
-    private void startAnimation() {
-        TransitionManager.beginDelayedTransition(rootView);
-        rightview.setVisibility(View.VISIBLE);
-        startText_right.setVisibility(View.VISIBLE);
-    }
-
-    private void rightSwipe() {
-        // Initialize GestureDetector
-        gestureDetector = new GestureDetector(this, new RightGestureListener());
-
-        // Create a transparent overlay window
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        touchView = new View(this);
-
-        int quarterScreenHeight = getResources().getDisplayMetrics().heightPixels / 4;
-
-        //If whole =1 what about
-        // Set width to match parent and height to a fixed value for the bottom part
-        int width = 20;
-        int height = quarterScreenHeight;  // Adjust as needed
-
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                width,
-                height,
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
-                        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY :
-                        WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
-                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-
-        // Set the overlay to the bottom of the screen
-        params.gravity = Gravity.BOTTOM | Gravity.END;
-
-        windowManager.addView(touchView, params);
-
-        // Set touch listener on the overlay view
-        touchView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                gestureDetector.onTouchEvent(event);
-                return true; // consume the touch event
-            }
-        });
-
-    }
-
-    private void leftSwipe() {
-        // Initialize GestureDetector
-        leftGesture = new GestureDetector(this, new LeftGesture());
-
-        // Create a transparent overlay window
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        touchView = new View(this);
-
-        int quarterScreenHeight = getResources().getDisplayMetrics().heightPixels / 4;
-
-        //If whole =1 what about
-        // Set width to match parent and height to a fixed value for the bottom part
-        int width = 20;
-        int height = quarterScreenHeight;  // Adjust as needed
-
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                width,
-                height,
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
-                        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY :
-                        WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
-                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-
-        // Set the overlay to the bottom of the screen
-        params.gravity = Gravity.BOTTOM | Gravity.START;
-
-        windowManager.addView(touchView, params);
-
-        // Set touch listener on the overlay view
-        touchView.setOnTouchListener((v, event) -> {
-            leftGesture.onTouchEvent(event);
-            return true; // consume the touch event
-        });
-
-    }
-
-    private class RightGestureListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onDown(MotionEvent e) {
-            // Always return true to indicate that the down event was consumed
-            Log.d("TEST SCREEN", "DOWN " + e.getY());
-            return true;
-        }
-
-        @Override
-        public void onLongPress(@NonNull MotionEvent e) {
-            super.onLongPress(e);
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        proceeding.setOnClickListener(v -> {
             vibrate();
             TransitionManager.beginDelayedTransition(rootView);
             congrats.setVisibility(View.VISIBLE);
 
+            proceeding.setEnabled(false);
             new Handler().postDelayed(() -> {
+                proceeding.setVisibility(View.GONE);
+                donewithintro.setVisibility(View.VISIBLE);
                 TransitionManager.beginDelayedTransition(rootView);
+                startText_right.setText("Swiping from the section shown below going rightwards, opens a drawer containing your recent and fav apps");
                 congrats.setVisibility(View.INVISIBLE);
-                startText_right.setVisibility(View.GONE);
                 rightview.setVisibility(View.GONE);
-                startText_left.setVisibility(View.VISIBLE);
                 leftView.setVisibility(View.VISIBLE);
-                leftSwipe();
             }, 1500);
 
-            return true;
-        }
-    }
-
-    private class LeftGesture extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onDown(MotionEvent e) {
-            // Always return true to indicate that the down event was consumed
-            Log.d("TEST SCREEN", "DOWN " + e.getY());
-            return true;
-        }
+        });
 
 
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        donewithintro.setOnClickListener(v -> {
             vibrate();
             TransitionManager.beginDelayedTransition(rootView);
+            cache.setText("You're all set :)");
             congrats.setVisibility(View.VISIBLE);
-
+            donewithintro.setEnabled(false);
             //Initialize SharedPreferences
             SharedPreferences.Editor pref = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE).edit();
             pref.putBoolean("Seen", true);
@@ -231,11 +127,85 @@ public class IntroPageActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 finish();
             }, 2000);
-
-
-            return true;
-        }
+        });
     }
+
+    private void startBouncing() {
+        final float scaleFactor = 1.1f; // Adjust the scaling factor as needed
+        // Create ObjectAnimators for scaling
+        ObjectAnimator inflate = ObjectAnimator.ofPropertyValuesHolder(
+                proceeding,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, scaleFactor),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, scaleFactor)
+        );
+        inflate.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        ObjectAnimator deflate = ObjectAnimator.ofPropertyValuesHolder(
+                proceeding,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
+        );
+        deflate.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        // Create AnimatorSet
+        final AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playSequentially(inflate, deflate);
+        animatorSet.setDuration(2200); // Adjust the duration as needed
+
+        // Set up listener to restart the animation when it ends
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                animatorSet.start(); // Start the animation again when it ends
+            }
+        });
+
+        // Start the animation
+        animatorSet.start();
+
+
+        // Create ObjectAnimators for scaling
+        ObjectAnimator inflateS = ObjectAnimator.ofPropertyValuesHolder(
+                donewithintro,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, scaleFactor),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, scaleFactor)
+        );
+
+        inflateS.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        ObjectAnimator deflateS = ObjectAnimator.ofPropertyValuesHolder(
+                donewithintro,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
+        );
+        deflateS.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        // Create AnimatorSet
+        final AnimatorSet an = new AnimatorSet();
+        an.playSequentially(inflateS, deflateS);
+        an.setDuration(2200); // Adjust the duration as needed
+
+        // Set up listener to restart the animation when it ends
+        an.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                an.start(); // Start the animation again when it ends
+            }
+        });
+
+        // Start the animation
+        an.start();
+    }
+
+    private void startAnimation() {
+        TransitionManager.beginDelayedTransition(rootView);
+        rightview.setVisibility(View.VISIBLE);
+        startText_right.setVisibility(View.VISIBLE);
+    }
+
+
 
     private void vibrate() {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);

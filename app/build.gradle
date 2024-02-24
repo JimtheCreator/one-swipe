@@ -5,6 +5,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\LENOVO\\AndroidStudioProjects\\One Swipe\\key\\key0.jks')
+            storePassword '20385377Msa'
+            keyAlias 'key0'
+            keyPassword '20385377Msa'
+        }
+    }
     namespace 'mappedvision.shortcuts.net'
     compileSdk 34
 
@@ -12,8 +20,9 @@ android {
         applicationId "mappedvision.shortcuts.net"
         minSdk 25
         targetSdk 34
-        versionCode 8
-        versionName "1.1.1"
+        versionCode 10
+        versionName "1.1.5" //Version changes should be applied in strings resource too
+
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -22,6 +31,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -32,7 +42,6 @@ android {
 }
 
 dependencies {
-
     //Progress
     implementation 'com.github.ibrahimsn98:CirclesLoadingView:1.0'
 
