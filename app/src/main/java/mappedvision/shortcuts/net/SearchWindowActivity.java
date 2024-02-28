@@ -31,8 +31,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -41,46 +47,86 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import adapters.AppSearchAdapter;
+import adapters.RecentSearchAdapter;
+import adapters.SuggestionsAdapter;
+import api.RetrofitClient;
 import decor.ParallaxItemDecoration;
+import interface_pack.SearchService;
+import model.Item;
 import model.JustInfoApps;
+import model.SearchResponse;
 import model.SearchedApp;
+import network.NetworkConnectionManager;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.ConnectionPool;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Retrofit;
+import space.SpacebetweenItems;
 import utils.PreforSearch;
 import utils.SharedPrefUtils;
+import utils.WebsiteRecentSearch;
+
 
 public class SearchWindowActivity extends Activity {
+
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "theme";
+    Retrofit retrofit;
     //    SoftInputAssist softInputAssist;
     AppInfoAdapter adapter;
     SearchView search_bar;
     AppSearchAdapter appSearchAdapter;
     ViewGroup root;
-    TextView header;
-    RecyclerView suggestions_recyclerview, search_apps_recyclerview;
-    LinearLayout quicksearch_holder;
+    TextView header, clearRecents;
+    RecyclerView suggestions_recyclerview, search_apps_recyclerview, recentsearchRecyclerView;
+    LinearLayout quicksearch_holder, recentsearchLayout, holderofsearch;
     RelativeLayout youtube, websearch, playstore;
     TextView text1, text2, text3;
+    RecentSearchAdapter recentSearchAdapter;
+    List<String> recentsList;
+    private SearchView searchView;
+    private RecyclerView recyclerView;
+    private SuggestionsAdapter suggestionsAdapter;
+    private SearchService searchService;
     private List<JustInfoApps> appInfoList;
     private List<SearchedApp> appList;
+
+    List<Item> itemList = new ArrayList<>();
 
     @Override
     protected void onStart() {
         super.onStart();
         applyTheme();
-
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(this::initializeRetrofit);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
+        // Set window flags to disable animations
+        getWindow().setWindowAnimations(0);
+        // Set window flags to keep the screen on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_search_window);
 
+        // Initialize RecyclerView and adapter
+        recyclerView = findViewById(R.id.recyclerView);
+
+        holderofsearch = findViewById(R.id.holderofsearch);
+        clearRecents = findViewById(R.id.clearRecents);
+        recentsearchLayout = findViewById(R.id.recentsearchLayout);
+        recentsearchRecyclerView = findViewById(R.id.recentsearchRecyclerView);
         youtube = findViewById(R.id.youtube);
         websearch = findViewById(R.id.websearch);
         playstore = findViewById(R.id.playstore);
         text1 = findViewById(R.id.text1);
         text2 = findViewById(R.id.text2);
+
         text3 = findViewById(R.id.text3);
         quicksearch_holder = findViewById(R.id.quicksearch_holder);
         root = findViewById(R.id.rooot);
@@ -90,33 +136,18 @@ public class SearchWindowActivity extends Activity {
         search_apps_recyclerview = findViewById(R.id.search_apps_recyclerview);
         search_bar = findViewById(R.id.search_bar);
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(() -> {
-            appList = PreforSearch.getAppInfoList(getApplicationContext());
-            appInfoList = SharedPrefUtils.getAppInfoList(getApplicationContext());
-
-            runOnUiThread(() -> {
-                appSearchAdapter = new AppSearchAdapter(getApplicationContext(), appList, SearchWindowActivity.this);
-                // The permission is already granted, proceed with your logic
-                int parallaxFactor = getResources().getDimensionPixelOffset(R.dimen.parallax_factor);
-                search_apps_recyclerview.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-                search_apps_recyclerview.setHasFixedSize(true);
-                search_apps_recyclerview.addItemDecoration(new ParallaxItemDecoration(5, 0));
-                search_apps_recyclerview.setAdapter(appSearchAdapter);
-
-
-                Log.d("SIZE", "No" + appList.size());
-                suggestions_recyclerview.addItemDecoration(new ParallaxItemDecoration(5, 0));
-                suggestions_recyclerview.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-                adapter = new AppInfoAdapter(getApplicationContext(), appInfoList);
-
-                suggestions_recyclerview.setHasFixedSize(true);
-                suggestions_recyclerview.setAdapter(adapter);
-                adapter.notifyItemChanged(0);
-            });
+        root.setOnClickListener(v -> {
+            hideKeyboard();
         });
 
-        Log.d("LISTS", "" + appList);
+//        findViewById(R.id.closenow).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                hideKeyboard();
+//                finishAffinity();
+//            }
+//        });
+
 
         // Add TextWatcher to dynamically filter the RecyclerView as the user types
         search_bar.requestFocus();
@@ -128,7 +159,6 @@ public class SearchWindowActivity extends Activity {
         EditText searchEditText = search_bar.findViewById(androidx.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(ContextCompat.getColor(getApplicationContext(), R.color.offwhite));
-
 
         search_bar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -143,6 +173,7 @@ public class SearchWindowActivity extends Activity {
             public boolean onQueryTextChange(String newText) {
                 filterNewtext(newText);
                 otherSearch(newText);
+                fetchSuggestions(newText);
                 return true;
             }
         });
@@ -158,9 +189,167 @@ public class SearchWindowActivity extends Activity {
         };
 
         adjustScreen();
+
+
+        clearRecents.setOnClickListener(v -> {
+            TransitionManager.beginDelayedTransition(root);
+            recentsearchLayout.setVisibility(View.GONE);
+            WebsiteRecentSearch.removeStringArray(getApplicationContext());
+        });
+
+        loadDATA();
     }
 
-    void otherSearch(String query){
+    private void fetchSuggestions(String query) {
+        if (!query.startsWith(" ")) {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectionPool(new ConnectionPool())
+                    .build();
+
+            HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.googleapis.com/customsearch/v1").newBuilder();
+            urlBuilder.addQueryParameter("q", query);
+            urlBuilder.addQueryParameter("key", getResources().getString(R.string.SEARCH_API));
+            urlBuilder.addQueryParameter("cx", getResources().getString(R.string.ENGINE_ID));
+            String url = urlBuilder.build().toString();
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        String responseData = response.body().string();
+                        Gson gson = new Gson();
+                        SearchResponse searchResponse = gson.fromJson(responseData, SearchResponse.class);
+                        runOnUiThread(() -> suggestionsAdapter.updateSuggestions(searchResponse.getItems()));
+                    } else {
+                        // Handle unsuccessful response
+                        runOnUiThread(() -> Log.d("ERROR", "ISSUE"));
+                    }
+                }
+            });
+        }
+    }
+
+    private void loadDATA() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(this::loadDataAndUpdateUI);
+    }
+
+    // Initialize Retrofit in a separate method
+    private void initializeRetrofit() {
+        if (NetworkConnectionManager.isNetworkConnected(getApplicationContext())){
+            RetrofitClient.getClient(new RetrofitClient.RetrofitCallback() {
+                @Override
+                public void onSuccess(Retrofit retrofit) {
+                    // Retrofit initialization successful
+                    TransitionManager.beginDelayedTransition(root);
+                    holderofsearch.setVisibility(View.VISIBLE);
+                    searchService = retrofit.create(SearchService.class);
+                    // Proceed with further operations
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    // Retrofit initialization failed
+                    // Handle the failure, such as displaying an error message
+                    Log.e("Retrofit", "Initialization failed: " + throwable.getMessage());
+                }
+            });
+        }
+    }
+
+    // Load data and update UI
+    private void loadDataAndUpdateUI() {
+        // Load data
+        appList = PreforSearch.getAppInfoList(getApplicationContext());
+        appInfoList = SharedPrefUtils.getAppInfoList(getApplicationContext());
+        recentsList = WebsiteRecentSearch.getStringArray(getApplicationContext());
+
+        // Update UI on the main thread
+        runOnUiThread(() -> {
+            // Update RecyclerViews and Adapters
+            if (itemList.size() > 0){
+                TransitionManager.beginDelayedTransition(root);
+                holderofsearch.setVisibility(View.VISIBLE);
+            }
+
+            suggestionsAdapter = new SuggestionsAdapter(itemList, getApplicationContext(), SearchWindowActivity.this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(suggestionsAdapter);
+
+            recentSearchAdapter = new RecentSearchAdapter(getApplicationContext(), recentsList, SearchWindowActivity.this);
+            recentsearchRecyclerView.addItemDecoration(new SpacebetweenItems(40));
+            recentsearchRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            recentsearchRecyclerView.setAdapter(recentSearchAdapter);
+
+            if (recentsList.size() == 0) {
+                recentsearchLayout.setVisibility(View.GONE);
+            }
+
+            appSearchAdapter = new AppSearchAdapter(getApplicationContext(), appList, SearchWindowActivity.this);
+            int parallaxFactor = getResources().getDimensionPixelOffset(R.dimen.parallax_factor);
+            search_apps_recyclerview.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+            search_apps_recyclerview.setHasFixedSize(true);
+            search_apps_recyclerview.addItemDecoration(new ParallaxItemDecoration(5, 0));
+            search_apps_recyclerview.setAdapter(appSearchAdapter);
+
+            suggestions_recyclerview.addItemDecoration(new ParallaxItemDecoration(5, 0));
+            suggestions_recyclerview.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+            adapter = new AppInfoAdapter(getApplicationContext(), appInfoList);
+            suggestions_recyclerview.setHasFixedSize(true);
+            suggestions_recyclerview.setAdapter(adapter);
+            adapter.notifyItemChanged(0);
+        });
+    }
+
+
+    private void handleResponse(SearchResponse response) {
+        // Handle the successful response here
+        // For example, you can update UI, process the response data, etc.
+    }
+
+    private void handleError(Throwable error) {
+        // Handle the error here
+        // For example, you can show an error message to the user, log the error, retry the request, etc.
+    }
+
+
+    private void updateUI(List<SearchedApp> appList, List<JustInfoApps> appInfoList) {
+        runOnUiThread(() -> {
+            // Assign the loaded data to your member variables
+            this.appList = appList;
+            this.appInfoList = appInfoList;
+
+            appSearchAdapter = new AppSearchAdapter(getApplicationContext(), appList, SearchWindowActivity.this);
+            // The permission is already granted, proceed with your logic
+            int parallaxFactor = getResources().getDimensionPixelOffset(R.dimen.parallax_factor);
+            search_apps_recyclerview.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+            search_apps_recyclerview.setHasFixedSize(true);
+            search_apps_recyclerview.addItemDecoration(new ParallaxItemDecoration(5, 0));
+            search_apps_recyclerview.setAdapter(appSearchAdapter);
+
+
+            Log.d("SIZE", "No" + appList.size());
+            suggestions_recyclerview.addItemDecoration(new ParallaxItemDecoration(5, 0));
+            suggestions_recyclerview.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+            adapter = new AppInfoAdapter(getApplicationContext(), appInfoList);
+
+            suggestions_recyclerview.setHasFixedSize(true);
+            suggestions_recyclerview.setAdapter(adapter);
+            adapter.notifyItemChanged(0);
+        });
+    }
+
+
+    void otherSearch(String query) {
         // Set the maximum length to 5 characters
         int maxLength = 20;
 
@@ -171,9 +360,7 @@ public class SearchWindowActivity extends Activity {
             text1.setText(truncatedText);
             text2.setText(truncatedText);
             text3.setText(truncatedText);
-        }
-
-        else {
+        } else {
             // Display the original text if it doesn't exceed the maximum length
             text1.setText(query);
             text2.setText(query);
@@ -181,10 +368,15 @@ public class SearchWindowActivity extends Activity {
         }
 
 
-        if (query.isEmpty() || query.startsWith(" ") || query.endsWith(" ")){
+        if (query.isEmpty() || query.startsWith(" ") || query.endsWith(" ")) {
+            if (WebsiteRecentSearch.getStringArray(getApplicationContext()).size() >= 1) {
+                recentsearchLayout.setVisibility(View.VISIBLE);
+            }
+
             TransitionManager.beginDelayedTransition(root);
             quicksearch_holder.setVisibility(View.GONE);
-        }else {
+        } else {
+            recentsearchLayout.setVisibility(View.GONE);
             TransitionManager.beginDelayedTransition(root);
             quicksearch_holder.setVisibility(View.VISIBLE);
         }
@@ -270,34 +462,33 @@ public class SearchWindowActivity extends Activity {
     }
 
     private void filterNewtext(String newText) {
-        List<SearchedApp> searchedAppList = new ArrayList<>();
-
-        for (SearchedApp searchedApp : appList) {
-            if (searchedApp.getAppName().toLowerCase().contains(newText.toLowerCase())) {
-                searchedAppList.add(searchedApp);
+        if (appList != null) {
+            List<SearchedApp> searchedAppList = new ArrayList<>();
+            for (SearchedApp searchedApp : appList) {
+                if (searchedApp.getAppName().toLowerCase().contains(newText.toLowerCase())) {
+                    searchedAppList.add(searchedApp);
+                }
             }
+
+            if (searchedAppList.isEmpty()) {
+                // Clear the adapter if the search text does not match any items
+                search_apps_recyclerview.setVisibility(View.GONE);
+                suggestions_recyclerview.setVisibility(View.VISIBLE);
+                header.setText("Suggestions");
+            } else {
+                // Update the search adapter with the filtered list
+                search_apps_recyclerview.setVisibility(View.VISIBLE);
+                suggestions_recyclerview.setVisibility(View.GONE);
+                header.setText("Top Hit");
+                appSearchAdapter.filterList(searchedAppList);
+            }
+
         }
-
-
-        if (searchedAppList.isEmpty()) {
-            // Clear the adapter if the search text does not match any items
-            search_apps_recyclerview.setVisibility(View.GONE);
-            suggestions_recyclerview.setVisibility(View.VISIBLE);
-            header.setText("Suggestions");
-        } else {
-            // Update the search adapter with the filtered list
-            search_apps_recyclerview.setVisibility(View.VISIBLE);
-            suggestions_recyclerview.setVisibility(View.GONE);
-            header.setText("Top Hit");
-            appSearchAdapter.filterList(searchedAppList);
-        }
-
     }
 
     private void adjustScreen() {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
-
 
     @Override
     protected void onDestroy() {
@@ -306,32 +497,10 @@ public class SearchWindowActivity extends Activity {
 //        softInputAssist.onDestroy();
     }
 
-//    private void restartService() {
-//        if (UsageStatsHelper.isUsageAccessPermissionGranted(getApplicationContext())) {
-//            // The permission is granted
-//            Intent ii = new Intent(getApplicationContext(), ShortcutService.class);
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                ContextCompat.startForegroundService(getApplicationContext(), ii);
-//            } else {
-//                startService(ii);
-//            }
-//        }
-//    }
-
-
-    @Override
-    protected void onResume() {
-        overridePendingTransition(0, 0);
-        super.onResume();
-//        softInputAssist.onResume();
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
-
         finishAffinity();
-//        softInputAssist.onPause();
     }
 
     private void applyTheme() {
@@ -387,6 +556,7 @@ public class SearchWindowActivity extends Activity {
         boolean darkThemeEnabled = prefs.getBoolean(THEME_KEY, false);
         return darkThemeEnabled;
     }
+
 
     private class AppInfoAdapter extends RecyclerView.Adapter<AppInfoAdapter.ViewHolder> {
         private List<JustInfoApps> appInfoList;
@@ -448,11 +618,8 @@ public class SearchWindowActivity extends Activity {
 
         @Override
         public int getItemCount() {
-            if (appInfoList.size() > 8) {
-                return 8;
-            }
+            return Math.min(appInfoList.size(), 8);
 
-            return appInfoList.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {

@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progress;
     Handler handler = new Handler();
     RelativeLayout floatingBall;
-    LinearLayout issueslayout, battery, themainthing, displayoverapps, list, viewHolder, settings, holder;
+    LinearLayout issueslayout, battery, themainthing, displayoverapps, list, viewHolder, settings, holder, oko;
     ViewGroup viewGroup;
 
     private final ActivityResultLauncher<Intent> requestOverlayPermissionLauncher =
@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
         isChecked = preference.getBoolean("Checked", false);
 
         most = findViewById(R.id.most);
+        oko = findViewById(R.id.oko);
         holder = findViewById(R.id.holder);
         mainroot = findViewById(R.id.mainroot);
         screenHeight = getResources().getDisplayMetrics().heightPixels;
@@ -348,6 +349,7 @@ public class MainActivity extends AppCompatActivity {
         puthingstonull();
 
         settings.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), SettingsActivity.class)));
+
     }
 
     private void applyTheme() {
@@ -494,18 +496,30 @@ public class MainActivity extends AppCompatActivity {
     private void updateUI(List<JustInfoApps> usageStatsList, List<JustInfoApps> appList) {
         // Update the first adapter
         // Create a custom adapter
-        adapter = new MyAdapter(usageStatsList, MainActivity.this);
-        otherAdapter = new OtherAdapter(appList, MainActivity.this);
 
-        viewHolder.setVisibility(View.VISIBLE);
-        progress.setVisibility(View.GONE);
-        mostTxt.setText(String.valueOf(usageStatsList.size()));
-        TransitionManager.beginDelayedTransition(viewGroup);
-        listView.setAdapter(adapter);
-        otherslist.setAdapter(otherAdapter);
-        othertxt.setText(String.valueOf(appList.size()));
-        otherAdapter.notifyItemChanged(0);
-        adapter.notifyItemInserted(0);
+        if (usageStatsList.size() == 0){
+            oko.setVisibility(View.GONE);
+            otherAdapter = new OtherAdapter(appList, MainActivity.this);
+            viewHolder.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+            mostTxt.setText("0");
+            TransitionManager.beginDelayedTransition(viewGroup);
+            otherslist.setAdapter(otherAdapter);
+            othertxt.setText(String.valueOf(appList.size()));
+            otherAdapter.notifyItemChanged(0);
+        }else {
+            adapter = new MyAdapter(usageStatsList, MainActivity.this);
+            otherAdapter = new OtherAdapter(appList, MainActivity.this);
+            viewHolder.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+            mostTxt.setText(String.valueOf(usageStatsList.size()));
+            TransitionManager.beginDelayedTransition(viewGroup);
+            listView.setAdapter(adapter);
+            otherslist.setAdapter(otherAdapter);
+            othertxt.setText(String.valueOf(appList.size()));
+            otherAdapter.notifyItemChanged(0);
+            adapter.notifyItemInserted(0);
+        }
     }
 
     private List<JustInfoApps> getAllInstalledApps() {

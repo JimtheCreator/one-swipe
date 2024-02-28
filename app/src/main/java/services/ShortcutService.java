@@ -1,6 +1,5 @@
 package services;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -23,7 +22,6 @@ import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -42,34 +40,38 @@ import utils.SharedPrefUtils;
 
 public class ShortcutService extends Service {
 
+
+
     private static final String SIZE_NAME = "SeekBar";
+
     private static final String SIZE_KEY = "size";
+    private static final String CHANNEL_ID = "intercept";
     String seekBarprogress;
     int width;
-    private static final String CHANNEL_ID = "intercept";
     Long lastEventTime;
-    private WindowManager leftwindowManager, rightwindowManager;
-    private View righttouchView, leftTouchView;
-    private GestureDetector gestureDetector, leftGesture;
     String name;
     Handler hh = new Handler();
     Handler handler = new Handler();
     //    public static boolean isTRIGGERED = false;
     List<String> interveneApps = new ArrayList<>();
+    SharedPreferences prefs;
+    private WindowManager leftwindowManager, rightwindowManager;
+    private View righttouchView, leftTouchView;
+    private GestureDetector gestureDetector, leftGesture;
     private HashMap<String, Handler> resetHandlers = new HashMap<>();
     private UsageStatsManager usageStatsManager;
     private HashMap<String, Long> lastBackgroundEvent = new HashMap<>();
     private AlarmManager alarmManager;
     private PendingIntent alarmIntent;
     private HashMap<String, Long> lastForegroundEvent = new HashMap<>();
-    SharedPreferences prefs;
 
-
+    View view;
     @Override
     public void onCreate() {
         super.onCreate();
         // Your task to run every second
         prefs = getSharedPreferences(SIZE_NAME, MODE_PRIVATE);
+
         // Start the periodic task
         seekBarprogress = prefs.getString(SIZE_KEY, "none");
 
@@ -90,7 +92,10 @@ public class ShortcutService extends Service {
 
         rightSwipe();
         leftSwipe();
+
+
     }
+
 
     private void rightSwipe() {
         int quarterScreenHeight = getResources().getDisplayMetrics().heightPixels / 4;
@@ -101,7 +106,7 @@ public class ShortcutService extends Service {
             seekBarprogress = "none";
         }
 
-        if (seekBarprogress.equals("none")){
+        if (seekBarprogress.equals("none")) {
             width = 50;
         } else {
             width = Integer.parseInt(seekBarprogress);
@@ -126,15 +131,15 @@ public class ShortcutService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         // Set the overlay to the bottom of the screen
-        params.gravity = Gravity.BOTTOM|Gravity.END;
+        params.gravity = Gravity.BOTTOM | Gravity.END;
 
         rightwindowManager.addView(righttouchView, params);
 
         // Set touch listener on the overlay view
         righttouchView.setOnTouchListener((v, event) -> {
-            if (gestureDetector != null){
+            if (gestureDetector != null) {
                 gestureDetector.onTouchEvent(event);
-                Log.d("LOG", "RIGHT "+width);
+                Log.d("LOG", "RIGHT " + width);
             }
 
             return true; // consume the touch event
@@ -150,7 +155,7 @@ public class ShortcutService extends Service {
             seekBarprogress = "none";
         }
 
-        if (seekBarprogress.equals("none")){
+        if (seekBarprogress.equals("none")) {
             width = 50;
         } else {
             width = Integer.parseInt(seekBarprogress);
@@ -176,15 +181,15 @@ public class ShortcutService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         // Set the overlay to the bottom of the screen
-        params.gravity = Gravity.BOTTOM|Gravity.START;
+        params.gravity = Gravity.BOTTOM | Gravity.START;
 
         leftwindowManager.addView(leftTouchView, params);
 
         // Set touch listener on the overlay view
         leftTouchView.setOnTouchListener((v, event) -> {
-            if (leftGesture != null){
+            if (leftGesture != null) {
                 leftGesture.onTouchEvent(event);
-                Log.d("LOG", "LEFT "+width);
+                Log.d("LOG", "LEFT " + width);
             }
             return true; // consume the touch event
         });
@@ -216,7 +221,7 @@ public class ShortcutService extends Service {
         Notification notification = createNotification();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
-        }else {
+        } else {
             startForeground(1, notification);
         }
 
@@ -246,12 +251,13 @@ public class ShortcutService extends Service {
             rightwindowManager.removeView(righttouchView);
         }
 
-        if (seekBarprogress != null){
+        if (seekBarprogress != null) {
             if (seekBarprogress.equals("0")) {
                 PreforSearch.removeAll(getApplicationContext());
                 SharedPrefUtils.removeAll(getApplicationContext());
             }
         }
+
     }
 
     @Override
@@ -279,6 +285,21 @@ public class ShortcutService extends Service {
         return super.onUnbind(intent);
     }
 
+    private void vibrate() {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator != null) {
+            // Vibrate for 500 milliseconds
+            vibrator.vibrate(30);
+        }
+    }
+
+    private void showToast(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onDown(MotionEvent e) {
@@ -296,11 +317,11 @@ public class ShortcutService extends Service {
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             vibrate();
 
-            Log.d("TEST SCREEN", "FLING " + e2.getY() + ""+e1.getY());
+            Log.d("TEST SCREEN", "FLING " + e2.getY() + "" + e1.getY());
             SharedPreferences pref = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
             boolean hasIllustrated = pref.getBoolean("Seen", false);
 
-            if (!hasIllustrated){
+            if (!hasIllustrated) {
                 showToast("Shortcut activated");
                 // Initialize SharedPreferences
                 // Initialize SharedPreferences
@@ -308,21 +329,22 @@ public class ShortcutService extends Service {
                 sha.putBoolean("Seen", true);
                 sha.apply();
 
-            }
-
-            else {
-                if (SharedPrefUtils.getAppInfoList(ShortcutService.this).size() == 0){
+            } else {
+                if (SharedPrefUtils.getAppInfoList(ShortcutService.this).size() == 0) {
                     showToast("No favourites saved");
-                }else {
+                } else {
                     try {
                         Intent intent = new Intent(ShortcutService.this, SearchWindowActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
                         // Handle the exception appropriately, perhaps by logging or displaying an error message.
                     }
 
+                    //Close your window here
+//                    SearchWindow searchWindow = new SearchWindow(ShortcutService.this);
+//                    searchWindow.open();
                 }
             }
 
@@ -353,7 +375,7 @@ public class ShortcutService extends Service {
             SharedPreferences pref = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
             boolean hasIllustrated = pref.getBoolean("Seen", false);
 
-            if (!hasIllustrated){
+            if (!hasIllustrated) {
                 showToast("Shortcut activated");
                 // Initialize SharedPreferences
                 // Initialize SharedPreferences
@@ -361,12 +383,10 @@ public class ShortcutService extends Service {
                 sha.putBoolean("Seen", true);
                 sha.apply();
 
-            }
-
-            else {
-                if (SharedPrefUtils.getAppInfoList(ShortcutService.this).size() == 0){
+            } else {
+                if (SharedPrefUtils.getAppInfoList(ShortcutService.this).size() == 0) {
                     showToast("No favourites saved");
-                }else {
+                } else {
                     Window window = new Window(ShortcutService.this);
                     window.open();
                 }
@@ -380,18 +400,5 @@ public class ShortcutService extends Service {
         }
     }
 
-    private void vibrate() {
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator != null) {
-            // Vibrate for 500 milliseconds
-            vibrator.vibrate(30);
-        }
-    }
-
-    private void showToast(String message) {
-        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
 
 }

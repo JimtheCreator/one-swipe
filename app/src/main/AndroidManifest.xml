@@ -12,14 +12,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <!-- For apps targeting Android 13 or higher & GMA SDK version 20.3.0 or lower -->
     <!--    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>-->
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <queries>
         <!-- Specify the package names of the apps you intend to interact with -->
@@ -30,9 +30,9 @@
         <!-- Add more packages if needed -->
     </queries>
 
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission"
-        />
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:allowBackup="true"
@@ -52,12 +52,14 @@
             android:name="intro.IntroPageActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".SearchWindowActivity"
             android:exported="false"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:taskAffinity="mappedvision.shortcuts.net.search_window"
+            android:theme="@style/Theme.Transparent"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
@@ -93,17 +95,17 @@
         </receiver>
 
         <service
-            android:foregroundServiceType="dataSync"
             android:name="services.ShortcutService"
             android:enabled="true"
             android:exported="true"
+            android:foregroundServiceType="dataSync"
             tools:ignore="ExportedService" />
 
         <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
         <!-- REAL LIVE ID => R.string.Admob_ID -->
-<!--        <meta-data-->
-<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
-<!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
+        <!--        <meta-data-->
+        <!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
+        <!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
 
     </application>
 

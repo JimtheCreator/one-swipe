@@ -63,6 +63,7 @@ public class AppSearchAdapter extends RecyclerView.Adapter<AppSearchAdapter.View
         this.activity = activity;
     }
 
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -101,7 +102,7 @@ public class AppSearchAdapter extends RecyclerView.Adapter<AppSearchAdapter.View
             String textToDisplay = appInfo.getAppName();
 
             // Set the maximum length to 5 characters
-            int maxLength = 5;
+            int maxLength = 10;
 
             // Check if the text exceeds the maximum length
             if (textToDisplay.length() > maxLength) {
@@ -113,11 +114,14 @@ public class AppSearchAdapter extends RecyclerView.Adapter<AppSearchAdapter.View
                 holder.appName.setText(appInfo.getAppName());
             }
 
+
+
         }
 
         if (state()){
             holder.appName.setTextColor(ContextCompat.getColor(context, R.color.white));
         }
+
         holder.itemView.setOnClickListener(v -> {
             String packageName = appInfo.getPackageName();
             openApp(packageName);
@@ -169,10 +173,7 @@ public class AppSearchAdapter extends RecyclerView.Adapter<AppSearchAdapter.View
      */
     @Override
     public int getItemCount() {
-        if (searchedAppList.size()>8){
-            return 8;
-        }
-        return searchedAppList.size();
+        return Math.min(searchedAppList.size(), 4);
     }
 
 

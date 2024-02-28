@@ -19,10 +19,10 @@
         <LinearLayout
             android:id="@+id/juju"
             android:layout_width="wrap_content"
-            android:layout_marginBottom="5dp"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -32,8 +32,8 @@
 
                 <ImageView
                     android:id="@+id/appIcon"
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
                     android:layout_gravity="center_horizontal"
                     android:src="@mipmap/ic_launcher" />
 
@@ -45,18 +45,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
+                    android:gravity="center_horizontal"
                     android:id="@+id/appName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:fontFamily="@font/sanfrans_regular"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/sanfrans_bold"
                     android:text="Instagram"
                     android:textColor="@color/white"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 

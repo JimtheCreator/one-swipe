@@ -4,7 +4,9 @@
     <string name="search">Search</string>
     <string name="redirecting">Redirecting...</string>
     <string name="license_progress">MIT License Copyright © 2019 İbrahim Süren\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to dealin the Software without restriction, including without limitation the rightsto use, copy, modify, merge, publish, distribute, sublicense, and/or sellcopies of the Software, and to permit persons to whom the Software isfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in allcopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS ORIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THEAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHERLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THESOFTWARE.</string>
-    <string name="app_version">App version: 1.1.5</string>
+    <string name="app_version">App version: 1.2.0</string>
+    <string name="SEARCH_API">AIzaSyAFID1rkfBTwZWp7rhQxcgqMTCsAuFODS8</string>
+    <string name="ENGINE_ID">57bfc1a99bc7a40b7</string>
     <string name="Admob_ID">ca-app-pub-3687194115540655~7473940924</string>
     <string name="bannerAds">ca-app-pub-3687194115540655/2137853765</string>
     <string name="nativeAds">ca-app-pub-3687194115540655/6142362163</string>
