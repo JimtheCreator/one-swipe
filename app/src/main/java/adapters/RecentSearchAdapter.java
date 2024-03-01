@@ -1,6 +1,7 @@
 package adapters;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,11 +18,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import mappedvision.shortcuts.net.R;
-import model.Item;
-import model.Recents;
+import model.SelectedItem;
 import utils.WebsiteRecentSearch;
 
 public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapter.ViewHolder> {
@@ -49,10 +50,10 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
 
     Context context;
 
-    List<String> stringList;
+    List<SelectedItem> stringList;
     Activity activity;
 
-    public RecentSearchAdapter(Context context, List<String> stringList, Activity activity) {
+    public RecentSearchAdapter(Context context, List<SelectedItem> stringList, Activity activity) {
         this.context = context;
         this.stringList = stringList;
         this.activity = activity;
@@ -89,7 +90,9 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
 
     @Override
     public void onBindViewHolder(@NonNull RecentSearchAdapter.ViewHolder holder, int position) {
-        String string = stringList.get(position);
+        SelectedItem selectedItem = stringList.get(position);
+
+        String string = selectedItem.getSelectedItem();
 
         if (position == getItemCount()-1){
             holder.stroke.setVisibility(View.GONE);
@@ -97,21 +100,23 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
 
 
         // Set the maximum length to 5 characters
-        int maxLength = 20;
+//        int maxLength = 20;
+//
+//        // Check if the text exceeds the maximum length
+//        if (string.length() > maxLength) {
+//            // Truncate the text and append ellipsis
+//            String truncatedText = string.substring(0, maxLength) + "...";
+//            holder.searched_txt.setText(truncatedText);
+//        } else {
+//            // Display the original text if it doesn't exceed the maximum length
+//            holder.searched_txt.setText(string);
+//        }
 
-        // Check if the text exceeds the maximum length
-        if (string.length() > maxLength) {
-            // Truncate the text and append ellipsis
-            String truncatedText = string.substring(0, maxLength) + "...";
-            holder.searched_txt.setText(truncatedText);
-        } else {
-            // Display the original text if it doesn't exceed the maximum length
-            holder.searched_txt.setText(string);
-        }
+        holder.searched_txt.setText(string);
 
 
         holder.itemView.setOnClickListener(v->{
-            openLink(string);
+            openLink(selectedItem.getOrigin(),string);
             hideKeyboard();
         });
     }
@@ -153,20 +158,48 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
     }
 
 
-    private void openLink(String link) {
-        try {
-            WebsiteRecentSearch.addItem(context, link);
-            // Create an intent to open the link in a web browser
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-            context.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // Handle the case where no activity is found to handle the intent
-            showToast("No browser found to open");
-        } catch (Exception e) {
-            // Handle other exceptions
-            showToast("Error occurred while opening the link");
-            e.printStackTrace();
+    private void openLink(String origin, String link) {
+        if (origin.equals("youtube")){
+            Intent intent = new Intent(Intent.ACTION_SEARCH);
+            intent.setPackage("com.google.android.youtube");
+            intent.putExtra("query", link);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            }else {
+                showToast("Get the YouTube app");
+            }
+        }else if (origin.equals("playstore")){
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("market://search?q=" + URLEncoder.encode(link, "UTF-8")));
+                context.startActivity(intent);
+                hideKeyboard();
+            } catch (ActivityNotFoundException | UnsupportedEncodingException e) {
+                // The Play Store app is not installed on the device, use the browser version.
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("https://play.google.com/store/search?q=" + URLEncoder.encode(link, "UTF-8")));
+                    context.startActivity(intent);
+                    hideKeyboard();
+                } catch (UnsupportedEncodingException ex) {
+                    // Handle the exception
+                    showToast("Something went wrong!!!!");
+                    hideKeyboard();
+                }
+            }
+        } else if (origin.equals("google")) {
+            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+            intent.putExtra(SearchManager.QUERY, link);
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+                hideKeyboard();
+            } else {
+                showToast("Something went wrong!!!!");
+                hideKeyboard();
+            }
         }
+
     }
 
     private void showToast(String message) {

@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,10 +25,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
@@ -39,22 +41,28 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "theme";
-
     private static final String SIZE_NAME = "SeekBar";
     private static final String SIZE_KEY = "size";
+    private static final String COLOR_NAME = "Colour";
+    private static final String COLOR_KEY = "value";
+
+
     View rightview, leftview;
-//    TextView packagetxt,a, b;
+    //    TextView packagetxt,a, b;
 //    RelativeLayout first_box;
-    TextView state, sensitivity_txt, settings_text, c, d,e,f,g,h,i,j, troubleshoot;
-    ImageView closepage, restart_icon,k,l,m,n;
+    TextView state, sensitivity_txt, settings_text, c, d, e, f, g, h, i, j, troubleshoot, widgettext;
+    ImageView closepage, restart_icon, k, l, m, n, widgeticon, arrowone, arrowtwo, arrowthree, arrowfour, arrowfive;
     LinearLayout autorestartLayout, bottomparent;
-    RelativeLayout autorestart, instagramLay, contact, credits, theme, changesize, overlay, topParent;
+    RelativeLayout autorestart, instagramLay, contact, credits, theme, changesize, overlay, topParent, widgylayout;
     //    SwitchCompat switchCompat;
     boolean isChecked;
 
     AppCompatSeekBar seekBar;
     String seekBarprogress;
     NestedScrollView nested_view;
+    Handler getHandler = new Handler();
+
+    String colorKey;
 
     @Override
     protected void onStart() {
@@ -70,20 +78,27 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         isChecked = pref.getBoolean("Checked", false);
 
+        SharedPreferences sharedPreferences = getSharedPreferences(COLOR_NAME, MODE_PRIVATE);
+        colorKey = sharedPreferences.getString(COLOR_KEY, "none");
+
         SharedPreferences prefs = getSharedPreferences(SIZE_NAME, MODE_PRIVATE);
         seekBarprogress = prefs.getString(SIZE_KEY, "none");
 
         nested_view = findViewById(R.id.nested_view);
-//        switchCompat = findViewById(R.id.switchCompat);
+        widgettext = findViewById(R.id.widgettext);
+        widgeticon = findViewById(R.id.widgeticon);
         theme = findViewById(R.id.theme);
-//        packagetxt = findViewById(R.id.packagetxt);
         overlay = findViewById(R.id.overlay);
         changesize = findViewById(R.id.changesize);
         rightview = findViewById(R.id.rightview);
         leftview = findViewById(R.id.leftView);
 
-//        a = findViewById(R.id.a);
-//        b = findViewById(R.id.b);
+        arrowone = findViewById(R.id.arrowone);
+        arrowtwo = findViewById(R.id.arrowtwo);
+        arrowthree = findViewById(R.id.arrowthree);
+        arrowfive = findViewById(R.id.arrowfive);
+        arrowfour = findViewById(R.id.arrowfour);
+
         c = findViewById(R.id.c);
         d = findViewById(R.id.d);
         e = findViewById(R.id.e);
@@ -97,6 +112,8 @@ public class SettingsActivity extends AppCompatActivity {
         m = findViewById(R.id.m);
         n = findViewById(R.id.n);
 
+
+        widgylayout = findViewById(R.id.widgylayout);
         restart_icon = findViewById(R.id.restart_icon);
         bottomparent = findViewById(R.id.bottomparent);
         settings_text = findViewById(R.id.settings_text);
@@ -141,10 +158,18 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
 
-        theme.setOnClickListener(v -> {
+        widgylayout.setOnClickListener(v -> {
             if (state()){
-                openDarkBottomsheet();
+                openDarkWidgetBottomsheet();
             }else {
+                openWhiteWidgetBottomsheet();
+            }
+        });
+
+        theme.setOnClickListener(v -> {
+            if (state()) {
+                openDarkBottomsheet();
+            } else {
                 openBottomsheet();
             }
 
@@ -152,7 +177,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         seekBar.setMax(150);
 
-        if (seekBarprogress.equals("none")){
+        if (seekBarprogress.equals("none")) {
             sensitivity_txt.setText("50%");
             seekBar.setProgress(50);
 
@@ -169,9 +194,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             leftview.setLayoutParams(leftParams);
             rightview.setLayoutParams(params);
-        }
-
-        else {
+        } else {
             sensitivity_txt.setText(seekBarprogress + "%");
             seekBar.setProgress(Integer.parseInt(seekBarprogress));
 
@@ -227,7 +250,7 @@ public class SettingsActivity extends AppCompatActivity {
             changesize.setEnabled(false);
 
             Log.d("TAG", "0");
-            if (seekBarprogress.equals("0")){
+            if (seekBarprogress.equals("0")) {
                 // From an Activity
                 Intent stopIntent = new Intent(this, ShortcutService.class);
                 stopService(stopIntent);
@@ -244,7 +267,7 @@ public class SettingsActivity extends AppCompatActivity {
             edit.apply();
 
             Toast toast = Toast.makeText(getApplicationContext(), "Restarting app...", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.CENTER,0,0);
+            toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
             Handler handler = new Handler();
 
@@ -253,7 +276,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 SharedPreferences prefes = getSharedPreferences(SIZE_NAME, MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefes.edit();
-                editor.putString(SIZE_KEY,y);
+                editor.putString(SIZE_KEY, y);
                 editor.apply();
 
                 toast.cancel();
@@ -270,7 +293,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 // From an Activity
                 Intent stopIntent = new Intent(this, ShortcutService.class);
-                if (stopIntent != null){
+                if (stopIntent != null) {
                     stopService(stopIntent);
                 }
 
@@ -280,9 +303,9 @@ public class SettingsActivity extends AppCompatActivity {
                 handler.removeCallbacksAndMessages(null);
             }, 2000);
 
-
         });
     }
+
 
     void openBottomsheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottomsheetTheme);
@@ -349,6 +372,870 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         bottomSheetDialog.show();
+    }
+
+    void openWhiteWidgetBottomsheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottomsheetTheme);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.widget_layout,
+                (ViewGroup) findViewById(R.id.source));
+
+        bottomSheetDialog.setCancelable(true);
+        bottomSheetDialog.setContentView(view);
+        bottomSheetDialog.show();
+
+        Window window = getWindow();
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        window.setNavigationBarColor(ContextCompat.getColor(getApplicationContext(), R.color.offwhite));
+
+        RelativeLayout change = view.findViewById(R.id.change);
+        RelativeLayout transparentLayout = view.findViewById(R.id.transparentLayout);
+        RelativeLayout solidLayout = view.findViewById(R.id.solidLayout);
+        CardView appdrawer = view.findViewById(R.id.appdrawer);
+        CardView searchBox = view.findViewById(R.id.box);
+        NestedScrollView transparentNest = view.findViewById(R.id.transparentNest);
+        NestedScrollView solidNest = view.findViewById(R.id.solidNest);
+        ImageView downarrow1 = view.findViewById(R.id.downarrow1);
+        ImageView downarrow2 = view.findViewById(R.id.downarrow2);
+        ImageView solidicon = view.findViewById(R.id.solidicon);
+        ImageView transicon = view.findViewById(R.id.transicon);
+        TextView state = view.findViewById(R.id.state);
+
+        ShapeableImageView color1 = view.findViewById(R.id.color1);
+        ShapeableImageView color2 = view.findViewById(R.id.color2);
+        ShapeableImageView color3 = view.findViewById(R.id.color3);
+        ShapeableImageView color4 = view.findViewById(R.id.color4);
+        ShapeableImageView color5 = view.findViewById(R.id.color5);
+        ShapeableImageView color6 = view.findViewById(R.id.color6);
+        ShapeableImageView color7 = view.findViewById(R.id.color7);
+        ShapeableImageView color8 = view.findViewById(R.id.color8);
+        ShapeableImageView color9 = view.findViewById(R.id.color9);
+        ShapeableImageView color10 = view.findViewById(R.id.color10);
+        ShapeableImageView colorNONE = view.findViewById(R.id.colorNONE);
+
+        RelativeLayout strokedone = view.findViewById(R.id.strokedone);
+        RelativeLayout strokedtwo = view.findViewById(R.id.strokedtwo);
+        RelativeLayout strokedthree = view.findViewById(R.id.strokedthree);
+        RelativeLayout strokedfour = view.findViewById(R.id.strokedfour);
+        RelativeLayout strokedfive = view.findViewById(R.id.strokedfive);
+        RelativeLayout strokedsix = view.findViewById(R.id.strokedsix);
+        RelativeLayout strokedseven = view.findViewById(R.id.strokedseven);
+        RelativeLayout strokedeight = view.findViewById(R.id.strokedeight);
+        RelativeLayout strokednine = view.findViewById(R.id.strokednine);
+        RelativeLayout strokedten = view.findViewById(R.id.strokedten);
+        RelativeLayout strokedeleven = view.findViewById(R.id.strokedeleven);
+
+//        if (state()) {
+//            checkone.setVisibility(View.GONE);
+//            checktwo.setVisibility(View.VISIBLE);
+//        } else {
+//            checktwo.setVisibility(View.GONE);
+//            checkone.setVisibility(View.VISIBLE);
+//        }
+//
+//        lightmode.setOnClickListener(v -> {
+////            bottomSheetDialog.dismiss();
+//            checktwo.setVisibility(View.GONE);
+//            checkone.setVisibility(View.VISIBLE);
+//
+////            TransitionManager.beginDelayedTransition(viewGroup);
+//            change.setVisibility(View.VISIBLE);
+//            state.setText("Light");
+//        });
+//
+//        darkmode.setOnClickListener(v -> {
+////            bottomSheetDialog.dismiss();
+//            checkone.setVisibility(View.GONE);
+//            checktwo.setVisibility(View.VISIBLE);
+//
+////            TransitionManager.beginDelayedTransition(viewGroup);
+//            change.setVisibility(View.VISIBLE);
+//            state.setText("Dark");
+//        });
+//
+//        change.setOnClickListener(v -> {
+//            bottomSheetDialog.setCancelable(false);
+//            if (state.getText().toString().equals("Light")) {
+//                toggleLightTheme(bottomSheetDialog);
+//            } else {
+//                toggleDarkTheme(bottomSheetDialog);
+//            }
+//        });
+
+        checkColor(appdrawer, searchBox, strokedone, strokedtwo, strokedthree, strokedfour, strokedfive, strokedsix, strokedseven, strokedeight, strokednine, strokedten, strokedeleven);
+
+        colorNONE.setOnClickListener(v -> {
+            state.setText("none");
+            change.setVisibility(View.VISIBLE);
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.defaultCOLOR));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.defaultCOLOR));
+        });
+
+        color1.setOnClickListener(v -> {
+            String color = "#80FF4081";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool1));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool1));
+        });
+
+        color2.setOnClickListener(v1 -> {
+            String color = "#8081C784";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool2));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool2));
+        });
+
+        color3.setOnClickListener(v2 -> {
+            String color = "#804CAF50";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool3));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool3));
+        });
+
+        color4.setOnClickListener(v3 -> {
+            String color = "#80797DC4";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool4));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool4));
+        });
+
+        color5.setOnClickListener(v4 -> {
+            String color = "#80668CFF";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool5));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool5));
+        });
+
+        color6.setOnClickListener(v5 -> {
+            String color = "#80C2185B";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool6));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool6));
+        });
+
+        color7.setOnClickListener(v6 -> {
+            String color = "#80FF9800";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool7));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool7));
+        });
+
+        color8.setOnClickListener(v7 -> {
+            String color = "#80FF6F00";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool8));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool8));
+        });
+
+        color9.setOnClickListener(v8 -> {
+            String color = "#808BC34A";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool9));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool9));
+        });
+
+        color10.setOnClickListener(v9 -> {
+            String color = "#803F51B5";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool10));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool10));
+        });
+
+        solidLayout.setOnClickListener(new View.OnClickListener() {
+//            boolean visible;
+
+            @Override
+            public void onClick(View v) {
+//                visible = !visible;
+//
+//                solidNest.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                downarrow1.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                solidicon.setVisibility(visible ? View.GONE : View.VISIBLE);
+
+
+                showToast("COMING SOON ;))");
+            }
+        });
+
+        transparentLayout.setOnClickListener(new View.OnClickListener() {
+            boolean visible;
+
+            @Override
+            public void onClick(View v) {
+                visible = !visible;
+
+                transparentNest.setVisibility(visible ? View.VISIBLE : View.GONE);
+                downarrow2.setVisibility(visible ? View.VISIBLE : View.GONE);
+                transicon.setVisibility(visible ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        change.setOnClickListener(v -> {
+            String gotColor = state.getText().toString();
+            Toast toast = Toast.makeText(getApplicationContext(), "Restarting...", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+
+            getHandler.postDelayed(() -> {
+                finishAndRemoveTask();
+
+                SharedPreferences prefes = getSharedPreferences(COLOR_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefes.edit();
+                editor.putString(COLOR_KEY, gotColor);
+                editor.apply();
+
+                toast.cancel();
+
+                Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+
+                if (intent != null) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else {
+                    // Handle the case where the intent is null
+                    Log.e("RestartApp", "Intent is null");
+                }
+
+                // From an Activity
+                Intent stopIntent = new Intent(this, ShortcutService.class);
+                if (stopIntent != null) {
+                    stopService(stopIntent);
+                }
+
+                Log.d("TAG", "1");
+
+                // Clear the handler by removing any pending messages or tasks
+                getHandler.removeCallbacksAndMessages(null);
+            }, 2000);
+
+        });
+    }
+
+    void openDarkWidgetBottomsheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottomsheetTheme);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.dark_color_sheet,
+                (ViewGroup) findViewById(R.id.source));
+
+        bottomSheetDialog.setCancelable(true);
+        bottomSheetDialog.setContentView(view);
+        bottomSheetDialog.show();
+
+        Window window = getWindow();
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        window.setNavigationBarColor(ContextCompat.getColor(getApplicationContext(), R.color.offwhite));
+
+        RelativeLayout change = view.findViewById(R.id.change);
+        RelativeLayout transparentLayout = view.findViewById(R.id.transparentLayout);
+        RelativeLayout solidLayout = view.findViewById(R.id.solidLayout);
+        CardView appdrawer = view.findViewById(R.id.appdrawer);
+        CardView searchBox = view.findViewById(R.id.box);
+        NestedScrollView transparentNest = view.findViewById(R.id.transparentNest);
+        NestedScrollView solidNest = view.findViewById(R.id.solidNest);
+        ImageView downarrow1 = view.findViewById(R.id.downarrow1);
+        ImageView downarrow2 = view.findViewById(R.id.downarrow2);
+        ImageView solidicon = view.findViewById(R.id.solidicon);
+        ImageView transicon = view.findViewById(R.id.transicon);
+        TextView state = view.findViewById(R.id.state);
+
+        ShapeableImageView color1 = view.findViewById(R.id.color1);
+        ShapeableImageView color2 = view.findViewById(R.id.color2);
+        ShapeableImageView color3 = view.findViewById(R.id.color3);
+        ShapeableImageView color4 = view.findViewById(R.id.color4);
+        ShapeableImageView color5 = view.findViewById(R.id.color5);
+        ShapeableImageView color6 = view.findViewById(R.id.color6);
+        ShapeableImageView color7 = view.findViewById(R.id.color7);
+        ShapeableImageView color8 = view.findViewById(R.id.color8);
+        ShapeableImageView color9 = view.findViewById(R.id.color9);
+        ShapeableImageView color10 = view.findViewById(R.id.color10);
+        ShapeableImageView colorNONE = view.findViewById(R.id.colorNONE);
+
+        RelativeLayout strokedone = view.findViewById(R.id.strokedone);
+        RelativeLayout strokedtwo = view.findViewById(R.id.strokedtwo);
+        RelativeLayout strokedthree = view.findViewById(R.id.strokedthree);
+        RelativeLayout strokedfour = view.findViewById(R.id.strokedfour);
+        RelativeLayout strokedfive = view.findViewById(R.id.strokedfive);
+        RelativeLayout strokedsix = view.findViewById(R.id.strokedsix);
+        RelativeLayout strokedseven = view.findViewById(R.id.strokedseven);
+        RelativeLayout strokedeight = view.findViewById(R.id.strokedeight);
+        RelativeLayout strokednine = view.findViewById(R.id.strokednine);
+        RelativeLayout strokedten = view.findViewById(R.id.strokedten);
+        RelativeLayout strokedeleven = view.findViewById(R.id.strokedeleven);
+
+//        if (state()) {
+//            checkone.setVisibility(View.GONE);
+//            checktwo.setVisibility(View.VISIBLE);
+//        } else {
+//            checktwo.setVisibility(View.GONE);
+//            checkone.setVisibility(View.VISIBLE);
+//        }
+//
+//        lightmode.setOnClickListener(v -> {
+////            bottomSheetDialog.dismiss();
+//            checktwo.setVisibility(View.GONE);
+//            checkone.setVisibility(View.VISIBLE);
+//
+////            TransitionManager.beginDelayedTransition(viewGroup);
+//            change.setVisibility(View.VISIBLE);
+//            state.setText("Light");
+//        });
+//
+//        darkmode.setOnClickListener(v -> {
+////            bottomSheetDialog.dismiss();
+//            checkone.setVisibility(View.GONE);
+//            checktwo.setVisibility(View.VISIBLE);
+//
+////            TransitionManager.beginDelayedTransition(viewGroup);
+//            change.setVisibility(View.VISIBLE);
+//            state.setText("Dark");
+//        });
+//
+//        change.setOnClickListener(v -> {
+//            bottomSheetDialog.setCancelable(false);
+//            if (state.getText().toString().equals("Light")) {
+//                toggleLightTheme(bottomSheetDialog);
+//            } else {
+//                toggleDarkTheme(bottomSheetDialog);
+//            }
+//        });
+
+        checkColor(appdrawer, searchBox, strokedone, strokedtwo, strokedthree, strokedfour, strokedfive, strokedsix, strokedseven, strokedeight, strokednine, strokedten, strokedeleven);
+
+        colorNONE.setOnClickListener(v -> {
+            state.setText("none");
+            change.setVisibility(View.VISIBLE);
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.defaultCOLOR));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.defaultCOLOR));
+        });
+
+        color1.setOnClickListener(v -> {
+            String color = "#80FF4081";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool1));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool1));
+        });
+
+        color2.setOnClickListener(v1 -> {
+            String color = "#8081C784";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool2));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool2));
+        });
+
+        color3.setOnClickListener(v2 -> {
+            String color = "#804CAF50";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool3));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool3));
+        });
+
+        color4.setOnClickListener(v3 -> {
+            String color = "#80797DC4";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool4));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool4));
+        });
+
+        color5.setOnClickListener(v4 -> {
+            String color = "#80668CFF";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool5));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool5));
+        });
+
+        color6.setOnClickListener(v5 -> {
+            String color = "#80C2185B";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool6));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool6));
+        });
+
+        color7.setOnClickListener(v6 -> {
+            String color = "#80FF9800";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool7));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool7));
+        });
+
+        color8.setOnClickListener(v7 -> {
+            String color = "#80FF6F00";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            // Change background color of the RelativeLayout
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool8));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool8));
+        });
+
+        color9.setOnClickListener(v8 -> {
+            String color = "#808BC34A";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool9));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool9));
+        });
+
+        color10.setOnClickListener(v9 -> {
+            String color = "#803F51B5";
+            state.setText(color);
+            change.setVisibility(View.VISIBLE);
+            strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+            strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.invincible_background));
+
+            strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            appdrawer.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool10));
+            searchBox.setCardBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.transparentCool10));
+        });
+
+        solidLayout.setOnClickListener(new View.OnClickListener() {
+//            boolean visible;
+
+            @Override
+            public void onClick(View v) {
+//                visible = !visible;
+//
+//                solidNest.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                downarrow1.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                solidicon.setVisibility(visible ? View.GONE : View.VISIBLE);
+
+
+                showToast("COMING SOON ;))");
+            }
+        });
+
+        transparentLayout.setOnClickListener(new View.OnClickListener() {
+            boolean visible;
+
+            @Override
+            public void onClick(View v) {
+                visible = !visible;
+
+                transparentNest.setVisibility(visible ? View.VISIBLE : View.GONE);
+                downarrow2.setVisibility(visible ? View.VISIBLE : View.GONE);
+                transicon.setVisibility(visible ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        change.setOnClickListener(v -> {
+            String gotColor = state.getText().toString();
+            Toast toast = Toast.makeText(getApplicationContext(), "Restarting...", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+
+            getHandler.postDelayed(() -> {
+                finishAndRemoveTask();
+
+                SharedPreferences prefes = getSharedPreferences(COLOR_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefes.edit();
+                editor.putString(COLOR_KEY, gotColor);
+                editor.apply();
+
+                toast.cancel();
+
+                Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+
+                if (intent != null) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else {
+                    // Handle the case where the intent is null
+                    Log.e("RestartApp", "Intent is null");
+                }
+
+                // From an Activity
+                Intent stopIntent = new Intent(this, ShortcutService.class);
+                if (stopIntent != null) {
+                    stopService(stopIntent);
+                }
+
+                Log.d("TAG", "1");
+
+                // Clear the handler by removing any pending messages or tasks
+                getHandler.removeCallbacksAndMessages(null);
+            }, 2000);
+
+        });
+    }
+    private void checkColor(CardView appdrawer, CardView searchBox, RelativeLayout strokedone, RelativeLayout strokedtwo, RelativeLayout strokedthree, RelativeLayout strokedfour, RelativeLayout strokedfive, RelativeLayout strokedsix, RelativeLayout strokedseven, RelativeLayout strokedeight, RelativeLayout strokednine, RelativeLayout strokedten, RelativeLayout strokedeleven) {
+        if (colorKey!=null){
+            if (!colorKey.equals("none")){
+                Log.d("COLOR CODE TWO", ""+colorKey);
+                switch (colorKey) {
+                    case "#80FF4081": // two
+                        // Do something for black color
+                        strokedtwo.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+                    case "#8081C784": // three
+                        // Do something for red color
+                        strokedthree.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+                    case "#804CAF50": //four
+                        // Do something for white color
+                        strokedfour.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+                    case "#80797DC4": // five
+                        // Do something for black color
+                        strokedfive.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+                    case "#80668CFF": // six
+                        // Do something for red color
+                        strokedsix.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+                    // Add more cases as needed
+                    case "#80C2185B": // seven
+                        // Do something for red color
+                        strokedseven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+
+                    case "#80FF9800": // eight
+                        // Do something for red color
+                        strokedeight.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+
+                    case "#80FF6F00": // nine
+                        // Do something for red color
+                        strokednine.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+
+                    case "#808BC34A": // ten
+                        // Do something for red color
+                        strokedten.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+
+                    case "#803F51B5": // eleven
+                        // Do something for red color
+                        strokedeleven.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+                        appdrawer.setCardBackgroundColor(Color.parseColor(colorKey));
+                        searchBox.setCardBackgroundColor(Color.parseColor(colorKey));
+                        break;
+
+                    default:
+                        Log.d("COLOR CODE", ""+colorKey);
+                        break;
+                }
+
+
+            }else {
+                strokedone.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_stroke));
+            }
+        }
+
+
     }
 
     void openDarkBottomsheet() {
@@ -527,7 +1414,7 @@ public class SettingsActivity extends AppCompatActivity {
         editor.apply();
 
         Toast toast = Toast.makeText(getApplicationContext(), "Restarting app...", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER,0,0);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
         Handler handler = new Handler();
 
@@ -572,6 +1459,14 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
 
+        arrowone.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.white_arrow_forward_ios_24));
+        arrowtwo.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.white_arrow_forward_ios_24));
+        arrowthree.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.white_arrow_forward_ios_24));
+        arrowfour.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.white_arrow_forward_ios_24));
+        arrowfive.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.white_arrow_forward_ios_24));
+
+        widgeticon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.white_widgets_24));
+        widgettext.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
         bottomparent.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
         topParent.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darkTheme));
         closepage.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.baseline_close_24));
@@ -609,7 +1504,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         Toast toast = Toast.makeText(getApplicationContext(), "Restarting app...", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER,0,0);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
         Handler handler = new Handler();
 
@@ -639,4 +1534,10 @@ public class SettingsActivity extends AppCompatActivity {
         return darkThemeEnabled;
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getHandler.removeCallbacksAndMessages(null);
+    }
 }

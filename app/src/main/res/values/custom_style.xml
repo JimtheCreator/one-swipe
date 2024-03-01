@@ -2,6 +2,6 @@
 <resources>
     <style name="rounded">
 
-        <item name="cornerSize">5%</item>
+        <item name="cornerSize">15%</item>
     </style>
 </resources>

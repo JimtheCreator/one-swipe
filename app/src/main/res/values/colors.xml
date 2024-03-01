@@ -54,4 +54,44 @@
     <color name="offwhite">#F5F5F5</color>
     <color name="colorDark">#C0000000</color>
     <color name="colorLight">#80FFFFFF</color>
+
+
+    <!--    FOR WIDGET-->
+    <color name="defaultCOLOR">#80CCCCCC</color>
+    <!--    SOLID COLORS-->
+    <color name="awesomeGreen">#8BC34A</color>
+    <color name="deepOrange">#FF5722</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="deepPurple">#673AB7</color>
+    <color name="amber">#FFC107</color>
+    <color name="teal">#009688</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="pink">#E91E63</color>
+    <color name="lime">#CDDC39</color>
+    <color name="brown">#795548</color>
+
+    <!--    TRANSPARENT COLORS-->
+<!--    <color name="transparentCool1">#90FFFFFF</color>-->
+<!--    <color name="transparentCool2">#90CBCBCB</color>-->
+<!--    <color name="transparentCool3">#9057A0D3</color>-->
+<!--    <color name="transparentCool4">#90E5E5E5</color>-->
+<!--    <color name="transparentCool5">#90FF5722</color>-->
+<!--    <color name="transparentCool6">#903F51B5</color>-->
+<!--    <color name="transparentCool7">#90673AB7</color>-->
+<!--    <color name="transparentCool8">#90FFC107</color>-->
+<!--    <color name="transparentCool9">#90009688</color>-->
+<!--    <color name="transparentCool10">#9000BCD4</color>-->
+
+    <color name="transparentCool1">#80FF4081</color>
+    <color name="transparentCool2">#8081C784</color>
+    <color name="transparentCool3">#804CAF50</color>
+    <color name="transparentCool4">#80797DC4</color>
+    <color name="transparentCool5">#80668CFF</color>
+    <color name="transparentCool6">#80C2185B</color>
+    <color name="transparentCool7">#80FF9800</color>
+    <color name="transparentCool8">#80FF6F00</color>
+    <color name="transparentCool9">#808BC34A</color>
+    <color name="transparentCool10">#803F51B5</color>
+
+
 </resources>
