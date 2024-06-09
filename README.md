@@ -33,7 +33,7 @@ We've integrated a fantastic iOS feature called tap-scroll. Simply click the sta
 
 ## How to Use
 
-1. **Download and Install**: Get One-Swipe from the Google Play Store and install it on your device.
+1. **Download and Install**: Get One-Swipe from the Amazon App Store and install it on your device.
 2. **Setup**: Follow the simple setup instructions to enable necessary permissions.
 3. **Customize**: Choose your favourite and most-used apps for quick access.
 4. **Swipe and Enjoy**:
