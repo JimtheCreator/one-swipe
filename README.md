@@ -50,7 +50,7 @@ We've integrated a fantastic iOS feature called tap-scroll. Simply click the sta
     - Tap on the status bar to quickly scroll back to the top of any list or page.
 
 ### Video on how to use it
-https://www.instagram.com/reel/C3wPWIwo7XU/?igsh=MThhZm5jYnRtN2Z3bA==
+https://youtube.com/shorts/3hpT4nvA2-c?si=6VXXBC7ejhF3lxGP
 
 
 ## Why One-Swipe?
