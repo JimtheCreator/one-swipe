@@ -6,8 +6,13 @@
 
 Enhance your phone's usage experience effortlessly with One-Swipe! Say farewell to endless scrolling and hello to a streamlined experience. With our app, navigating through your apps has never been smoother. Say goodbye to the stress of hunting for apps and embrace a seamless journey with One-Swipe!
 
-![screenshot](https://github.com/JimtheCreator/one-swipe/assets/138602861/bb385273-a95f-420a-86cb-dbb5386b8ddc)
+### Old UI
 
+![old-ui](https://github.com/JimtheCreator/one-swipe/assets/138602861/8b0fbe47-6357-41ee-b4ef-5ef5aaaf664b)
+
+### New-UI
+
+![new-ui](https://github.com/JimtheCreator/one-swipe/assets/138602861/d17c87b0-f3d0-4075-970a-b93433f4664f)
 
 ## Features
 
@@ -22,7 +27,7 @@ Browse through your installed apps and handpick the ones that make your heart ra
 #### Bottom Left Swipe
 Swipe from the bottom left edge of the screen to instantly access your favourite and recent apps! No matter where you are or what you're doing, your go-to apps are just a swipe away. It's convenience at your fingertips, anytime, anywhere.
 
-![Hotpot 3](https://github.com/JimtheCreator/one-swipe/assets/138602861/41a7ef6d-a934-4681-86b9-88ef422c8a43)
+![pic-app-tabs](https://github.com/JimtheCreator/one-swipe/assets/138602861/1a275e71-6f8b-43b6-b5a2-64992dde5c4b)
 
 
 #### Bottom Right Swipe
@@ -31,8 +36,8 @@ Swipe from the bottom right edge of the screen to perform a quick app or web sea
 ### iOS Tap-Scroll Feature
 We've integrated a fantastic iOS feature called tap-scroll. Simply click the status bar to quickly return to the top of the screen. It's a small addition that makes a huge difference in your browsing experience.
 
+![tap-scroll](https://github.com/JimtheCreator/one-swipe/assets/138602861/971d0990-4e53-44b5-89df-c16a7a97bca0)
 
-![screenshothree](https://github.com/JimtheCreator/one-swipe/assets/138602861/33668786-fa79-4971-811b-8a1aaa36f551)
 
 ## How to Use
 
