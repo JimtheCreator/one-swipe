@@ -22,6 +22,9 @@ Browse through your installed apps and handpick the ones that make your heart ra
 #### Bottom Left Swipe
 Swipe from the bottom left edge of the screen to instantly access your favourite and recent apps! No matter where you are or what you're doing, your go-to apps are just a swipe away. It's convenience at your fingertips, anytime, anywhere.
 
+![Hotpot 3](https://github.com/JimtheCreator/one-swipe/assets/138602861/41a7ef6d-a934-4681-86b9-88ef422c8a43)
+
+
 #### Bottom Right Swipe
 Swipe from the bottom right edge of the screen to perform a quick app or web search. Whether you need to find an app or look up information online, it's just a swipe away, making your multitasking game stronger than ever!
 
@@ -55,7 +58,7 @@ Welcome aboard as we revolutionize how you interact with your device. With One-S
 
 ## Feedback and Support
 
-We value your feedback! If you have any suggestions, or questions, or need support, please reach out to us at [support@oneswipe.com](mailto:jimmywire@skiff.com). We're here to help you get the most out of One-Swipe.
+We value your feedback! If you have any suggestions, or questions, or need support, please reach out to us at (mailto:jimmywire@skiff.com). We're here to help you get the most out of One-Swipe.
 
 ---
 
