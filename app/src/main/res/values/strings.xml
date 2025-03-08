@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">One Swipe</string>
+    <string name="using_this_app_and_its_features_requires_access_to_your_installed_apps_inventory_which_is_collected_and_stored_locally_so_you_can_select_and_save_as_favourites">Using this app and its features requires access to your installed apps inventory which is collected and stored locally so you can select and save them as favourites.\n\nDon\'t worry we will never access any of your data usage.</string>
+    <string name="search">Search</string>
+    <string name="redirecting">Redirecting...</string>
+    <string name="license_progress">MIT License Copyright © 2019 İbrahim Süren\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to dealin the Software without restriction, including without limitation the rightsto use, copy, modify, merge, publish, distribute, sublicense, and/or sellcopies of the Software, and to permit persons to whom the Software isfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in allcopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS ORIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THEAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHERLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THESOFTWARE.</string>
+    <string name="app_version">App version: 1.2.5</string>
+    <string name="SEARCH_API">AIzaSyAFID1rkfBTwZWp7rhQxcgqMTCsAuFODS8</string>
+    <string name="ENGINE_ID">57bfc1a99bc7a40b7</string>
+    <string name="Admob_ID">ca-app-pub-3687194115540655~7473940924</string>
+    <string name="bannerAds">ca-app-pub-3687194115540655/2137853765</string>
+    <string name="nativeAds">ca-app-pub-3687194115540655/6142362163</string>
+    <string name="interstitialAds">ca-app-pub-3687194115540655/2561714962</string>
+    <string name="rewardedAds">ca-app-pub-3687194115540655/7702855843</string>
+    <string name="your_presence_in_this_app_is_special_as_the_developer_personally_invited_you_your_insights_are_highly_valued_and_we_appreciate_your_contribution">Your presence in this app is special, as the developer personally invited you. Your insights are highly valued, and we appreciate your contribution.</string>
+    <string name="advice_for_gestures">For optimal One Swipe performance, stick to your device\'s default bottom navigation. It enhances accuracy and won\'t disrupt system back swipes.</string>
+    <string name="accessibility_service_description">Enable our Accessibility Service for enhanced navigation. This service monitors your screen, allowing One Swipe to trigger auto-scroll when needed. We value your privacy and do not collect any data.</string>
+    <string name="sensitivity_message">If you\'re having issues with swipes, you can reduce, or increase its sensitivity based on your preference</string>
+    <string name="getting_installed_apps">Getting installed apps...</string>
+    <string name="refreshing_the_list">Refreshing the list...</string>
+    <string name="finalizing">Finalizing...</string>
+
+</resources>

@@ -1,0 +1,65 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+}
+
+android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\LENOVO\\AndroidStudioProjects\\One Swipe\\key\\key0.jks')
+            storePassword '20385377Msa'
+            keyAlias 'key0'
+            keyPassword '20385377Msa'
+        }
+    }
+
+    namespace 'mappedvision.shortcuts.net'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "mappedvision.shortcuts.net"
+        minSdk 25
+        targetSdk 34
+        versionCode 21
+        versionName "1.2.5" //Version changes should be applied in strings resource too
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    //Progress
+    implementation 'com.github.ibrahimsn98:CirclesLoadingView:1.0'
+
+    //CRASH ANALYTICS
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

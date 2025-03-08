@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "958824550115",
+    "project_id": "one-swipe-fc393",
+    "storage_bucket": "one-swipe-fc393.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958824550115:android:83a5529b5505606d237fd6",
+        "android_client_info": {
+          "package_name": "mappedvision.shortcuts.net"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJteOQD9Tgz1SFStHJlZDZVmf4po07g48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958824550115:android:1d4aa04de7c57191237fd6",
+        "android_client_info": {
+          "package_name": "mylabs.shortcuts.net"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJteOQD9Tgz1SFStHJlZDZVmf4po07g48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

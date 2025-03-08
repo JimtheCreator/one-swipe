@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cool">#80FFFFFF</color>
+    <color name="grey">#CBCBCB</color>
+    <color name="blue">#57A0D3</color>
+    <color name="thickwhite">#E5E5E5</color>
+    <color name="invincibleColor">#00000000</color>
+    <color name="niceBlack">#0D0D0D</color>
+    <color name="coolDeepBlack">#010203</color>
+    <color name="ballBlack">#33363D</color>
+    <color name="thickerwhite">#E0E0E0</color>
+    <color name="niceblue">#66CCFF</color>
+    <color name="bblack">#222222</color>
+    <color name="foreignblue">#0e2433</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blackTransparent">#CC000000</color>
+    <color name="lightTransparent">#80FFFFFF</color>
+    <color name="black">#010101</color>
+    <color name="matteblack">#242124</color>
+    <color name="thickpink">#b30d0d</color>
+    <color name="onlyYT">#FF0000</color>
+    <color name="newlyaddedcolor1">#D2EDFC</color>
+    <color name="purpleembrace">#D10CFD</color>
+    <color name="newlyaddedcolor2">#287CF6</color>
+    <color name="newColor">#E6CDAE</color>
+    <color name="colorGrey">#CBCBCB</color>
+    <color name="colorOrange">#FFFF9800</color>
+    <color name="lightOrange">#FFA500</color>
+    <color name="red">#F0F40432</color>
+    <color name="boldred">#170808</color>
+    <color name="abitboldred">#271A1A</color>
+    <color name="thickGrey">#808080</color>
+    <color name="lightBlack">#242526</color>
+    <color name="lightlightBlack">#1F1F21</color>
+    <color name="invicibleColor">#00000000</color>
+    <color name="fadedgreen">#1B2719</color>
+    ♀<color name="thickRed">#FF782727</color>
+    <color name="uniqueColor">#182828</color>
+    <color name="lightblue">#ADD8E6</color>
+    <color name="foreignColor">#132020</color>
+    <color name="anotherForeign">#1c2f2f</color>
+    <color name="dimmed_green">#25D366</color>
+    <color name="testcolor">#38ed2e</color>
+    <color name="darkTheme">#121212</color>
+    <!--   Original LightGreen #00FA9A-->
+    <color name="lightGreen">#25D366</color>
+    <color name="thickGreen">#006400</color>
+    <color name="colorPurple">#800080</color>
+    <color name="offwhite">#F5F5F5</color>
+    <color name="colorDark">#C0000000</color>
+    <color name="darktransparency">#80000000</color>
+    <color name="colorLight">#80FFFFFF</color>
+    <color name="foreignBlack">#1D1D1D</color>
+
+    <!--    FOR WIDGET-->
+    <color name="defaultCOLOR">#80CCCCCC</color>
+    <!--    SOLID COLORS-->
+    <color name="awesomeGreen">#8BC34A</color>
+    <color name="deepOrange">#FF5722</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="deepPurple">#673AB7</color>
+    <color name="amber">#FFC107</color>
+    <color name="teal">#009688</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="pink">#E91E63</color>
+    <color name="lime">#CDDC39</color>
+    <color name="brown">#795548</color>
+
+    <!--    TRANSPARENT COLORS-->
+<!--    <color name="transparentCool1">#90FFFFFF</color>-->
+<!--    <color name="transparentCool2">#90CBCBCB</color>-->
+<!--    <color name="transparentCool3">#9057A0D3</color>-->
+<!--    <color name="transparentCool4">#90E5E5E5</color>-->
+<!--    <color name="transparentCool5">#90FF5722</color>-->
+<!--    <color name="transparentCool6">#903F51B5</color>-->
+<!--    <color name="transparentCool7">#90673AB7</color>-->
+<!--    <color name="transparentCool8">#90FFC107</color>-->
+<!--    <color name="transparentCool9">#90009688</color>-->
+<!--    <color name="transparentCool10">#9000BCD4</color>-->
+
+    <color name="transparentCool1">#80FF4081</color>
+    <color name="transparentCool2">#8081C784</color>
+    <color name="transparentCool3">#804CAF50</color>
+    <color name="transparentCool4">#80797DC4</color>
+    <color name="transparentCool5">#80668CFF</color>
+    <color name="transparentCool6">#80C2185B</color>
+    <color name="transparentCool7">#80FF9800</color>
+    <color name="transparentCool8">#80FF6F00</color>
+    <color name="transparentCool9">#808BC34A</color>
+    <color name="transparentCool10">#803F51B5</color>
+
+
+</resources>

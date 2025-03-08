@@ -1,0 +1,89 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ShortCuts" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/offwhite</item>
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+
+    <style name="Theme.ShortCuts" parent="Base.Theme.ShortCuts" />
+
+    <style name="Theme.Transparent" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:statusBarColor">#99000000</item>
+    </style>
+
+
+
+    <style name="CustomSearchViewStyle" parent="Widget.Material3.SearchView">
+        <!-- Customize text color -->
+        <item name="android:textColor">@color/offwhite</item>
+        <!-- Customize search icon -->
+        <item name="searchIcon">@drawable/baseline_search_24</item>
+        <!-- Customize close icon -->
+        <item name="closeIcon">@drawable/baseline_close_24</item>
+        <!-- Customize query hint color -->
+        <item name="android:textColorHint">@android:color/white</item>
+        <!-- Customize query text appearance -->
+    </style>
+
+    <style name="AppTheme.FullScreen" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
+    <style name="SeekBarThemeOverlay">
+        <item name="colorControlActivated">#1976D2</item>
+    </style>
+
+
+    <style name="CustomQueryTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="bottomsheetTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <!-- res/values/styles.xml -->
+    <style name="LightTheme" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize attributes for dark mode -->
+        <item name="android:windowBackground">@color/bblack</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorSecondary">@color/offwhite</item>
+        <!-- Add more attributes as needed -->
+    </style>
+
+    <style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/niceBlack</item>
+        <item name="android:navigationBarColor">@color/niceBlack</item>
+    </style>
+
+
+    <style name="SettingsTheme" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/niceBlack</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
+
+    <style name="THEMED" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:navigationBarColor">@color/niceBlack</item>
+        <item name="android:statusBarColor">@color/ballBlack</item>
+<!--        <item name="android:windowLightStatusBar">false</item>-->
+    </style>
+
+</resources>

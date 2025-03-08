@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    tools:context="intro.IntroPageActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/guide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <!--        <LinearLayout-->
+        <!--            android:layout_alignParentBottom="true"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_centerHorizontal="true"-->
+        <!--            android:orientation="vertical">-->
+
+        <!--            <RelativeLayout-->
+        <!--                android:visibility="gone"-->
+        <!--                android:id="@+id/close"-->
+        <!--                android:layout_gravity="center_horizontal"-->
+        <!--                android:layout_marginBottom="25dp"-->
+        <!--                android:layout_width="35dp"-->
+        <!--                android:layout_height="35dp"-->
+        <!--                android:background="@drawable/white_circle">-->
+
+        <!--                <ImageView-->
+        <!--                    android:layout_width="30dp"-->
+        <!--                    android:layout_height="30dp"-->
+        <!--                    app:tint="@color/black"-->
+        <!--                    android:layout_centerInParent="true"-->
+        <!--                    android:layout_marginBottom="20dp"-->
+        <!--                    android:src="@drawable/baseline_close_24" />-->
+
+        <!--            </RelativeLayout>-->
+
+
+        <!--            <TextView-->
+        <!--                android:textColor="@color/white"-->
+        <!--                android:layout_marginStart="30dp"-->
+        <!--                android:layout_marginEnd="30dp"-->
+        <!--                android:layout_width="230dp"-->
+        <!--                android:layout_gravity="center_horizontal"-->
+        <!--                android:gravity="center_horizontal"-->
+        <!--                android:fontFamily="@font/light"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:textSize="14sp"-->
+        <!--                android:text="Swipe down to access you favourites apps"/>-->
+
+        <!--            <RelativeLayout-->
+        <!--                android:id="@+id/pointer"-->
+        <!--                android:layout_gravity="center_horizontal"-->
+        <!--                android:layout_marginTop="5dp"-->
+        <!--                android:layout_marginBottom="50dp"-->
+        <!--                android:layout_width="60dp"-->
+        <!--                android:layout_height="60dp"-->
+        <!--                android:background="@drawable/circle_home_screen">-->
+
+        <!--                <ImageView-->
+        <!--                    android:layout_width="45dp"-->
+        <!--                    android:layout_height="45dp"-->
+        <!--                    android:layout_centerInParent="true"-->
+        <!--                    android:layout_marginBottom="20dp"-->
+        <!--                    android:src="@drawable/baseline_arrow_downward_24" />-->
+
+        <!--            </RelativeLayout>-->
+
+
+        <!--        </LinearLayout>-->
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/sanfrans_bold"
+            android:gravity="center_horizontal"
+            android:text="Your Guide"
+            android:textColor="@color/white"
+            android:textSize="25sp" />
+
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/startText_left"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_centerInParent="true"-->
+        <!--            android:layout_marginStart="20dp"-->
+        <!--            android:layout_marginEnd="20dp"-->
+        <!--            android:fontFamily="@font/sanfrans_bold"-->
+        <!--            android:gravity="center_horizontal"-->
+        <!--            android:text="To quickly open your favourite apps. Swipe from the section shown below going rightwards"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="22sp"-->
+        <!--            android:visibility="gone"-->
+        <!--            />-->
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/startText_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sanfrans_bold"
+                android:gravity="center_horizontal"
+                android:text="For a quick app search. You can swipe from the section shown below going leftwards"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/proceeding"
+                    android:layout_width="135dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/thicker_blue">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/sanfrans_bold"
+                        android:text="Next"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/donewithintro"
+                    android:layout_width="135dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/thicker_blue">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/sanfrans_bold"
+                        android:text="Done"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+
+                </RelativeLayout>
+
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/rightview"
+            android:layout_width="65dp"
+            android:layout_height="250dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/offwhite" />
+
+
+        <View
+            android:id="@+id/leftView"
+            android:layout_width="65dp"
+            android:layout_height="250dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/offwhite"
+            android:visibility="gone" />
+
+
+        <RelativeLayout
+            android:id="@+id/congrats"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_alignParentBottom="true"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/cache"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="That's not all..."
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

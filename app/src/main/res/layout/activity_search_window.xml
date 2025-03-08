@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rooot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#90000000"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".SearchWindowActivity"
+    >
+
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/swipey"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/sheet"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="2dp"
+        android:fitsSystemWindows="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/habba"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sanfrans_medium"
+                android:text="Suggestions"
+                android:textColor="@color/grey"
+                android:textSize="15sp" />
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/topsearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:cardBackgroundColor="#80CCCCCC"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="0dp">
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/suggestions_recyclerview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:padding="5dp" />
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/search_apps_recyclerview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:padding="5dp"
+                        android:visibility="gone" />
+
+                </RelativeLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+
+
+                <LinearLayout
+                    android:id="@+id/recentsearchLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:fontFamily="@font/sanfrans_medium"
+                            android:text="Recent search"
+                            android:textColor="@color/grey"
+                            android:textSize="15sp" />
+
+
+                        <TextView
+                            android:id="@+id/clearRecents"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:fontFamily="@font/sanfrans_medium"
+                            android:gravity="end"
+                            android:text="Clear"
+                            android:textColor="@color/grey"
+                            android:textSize="15sp" />
+
+
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.25dp"
+                        android:layout_marginTop="5dp"
+                        android:background="#80CCCCCC" />
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recentsearchRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:fitsSystemWindows="true"
+                        android:overScrollMode="never" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/quicksearch_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="vertical">
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/sanfrans_medium"
+                            android:text="Search in Apps"
+                            android:textColor="@color/grey"
+                            android:textSize="15sp" />
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0.25dp"
+                            android:layout_marginTop="5dp"
+                            android:background="#80CCCCCC" />
+
+                        <RelativeLayout
+                            android:id="@+id/youtube"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:orientation="horizontal">
+
+
+                                <ImageView
+                                    android:layout_width="25dp"
+                                    android:layout_height="25dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/youtube" />
+
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/sanfrans_medium"
+                                    android:text="YouTube"
+                                    android:textColor="@color/white"
+                                    android:textSize="17sp" />
+
+
+                                <TextView
+                                    android:id="@+id/text1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/sanfrans_bold"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:visibility="invisible" />
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/websearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="25dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:orientation="horizontal">
+
+
+                                <ImageView
+                                    android:layout_width="25dp"
+                                    android:layout_height="25dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/madegoogle" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/sanfrans_medium"
+                                    android:text="Google"
+                                    android:textColor="@color/white"
+                                    android:textSize="17sp" />
+
+
+                                <TextView
+                                    android:id="@+id/text2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/sanfrans_bold"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:visibility="invisible" />
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/playstore"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="25dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:orientation="horizontal">
+
+
+                                <ImageView
+                                    android:layout_width="25dp"
+                                    android:layout_height="25dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/google_playicon" />
+
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/sanfrans_medium"
+                                    android:text="Play Store"
+                                    android:textColor="@color/white"
+                                    android:textSize="17sp" />
+
+                                <TextView
+                                    android:id="@+id/text3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/sanfrans_bold"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:visibility="invisible" />
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:adjustViewBounds="true"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:padding="2dp"
+        app:cardBackgroundColor="#80CCCCCC"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="0dp">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_bar"
+            style="@style/CustomSearchViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:background="@color/invincibleColor"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search" />
+
+    </androidx.cardview.widget.CardView>
+
+
+</RelativeLayout>
+
