@@ -43,48 +43,38 @@
 
         <activity
             android:name="new_ui.NewCreditsActivity"
-            android:exported="false"
-            android:screenOrientation="fullSensor" />
+            android:exported="false" />
         <activity
             android:name="new_ui.NewSettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name="new_ui.AppDrawerListActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name="new_ui.HomeActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name="credit.CreditActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name="intro.IntroPageActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".SearchWindowActivity"
             android:exported="false"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:taskAffinity="mappedvision.shortcuts.net.search_window"
             android:theme="@style/Theme.Transparent"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".PermissionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
